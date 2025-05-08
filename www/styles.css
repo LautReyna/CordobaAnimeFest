@@ -1,0 +1,19 @@
+
+
+.zoom-img {
+    overflow: hidden; /* evita que la imagen agrandada desborde el div */
+    display: block;
+  }
+  
+  .zoom-img img {
+    transition: transform 0.3s ease;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .zoom-img:hover img {
+    transform: scale(1.1);
+  }
+
+  
