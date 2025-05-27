@@ -1,0 +1,12 @@
+FROM postgres:latest
+
+COPY caf.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432
+
+## docker build -t caf_imagen .
+## docker run --name caf_contenedor -e POSTGRES_USER=root -e POSTGRES_PASSWORD=pass 
+## -e POSTGRES_DB=caf -p 5432:5432 -d caf_imagen
+
+##docker exec -it caf_contenedor bash
+##root@46f9a5c99015:/# psql -U root -d caf --password
