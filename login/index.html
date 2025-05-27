@@ -13,11 +13,14 @@
         </nav>
     </header>
     <section>
+        <div id="login-error-msg-holder">
+            <p id="login-error-msg">Usuario y/o contraseña<span id="error-msg-second-line">incorrecto</span></p>
+        </div>
         <div class="container" style="width: 40%;">
             <div class="card mt-5">
                 <div class="card-header">Inicio de sesion como administrador</div>
                 <div class="card-body">
-                    <form action="" method="post">
+                    <form id="login-form" method="post">
                         <div class="mb-3">
                             <label for="user" class="form-label">Nombre de usuario:</label>
                             <input type="text" name="user" placeholder="user" class="form-control">
