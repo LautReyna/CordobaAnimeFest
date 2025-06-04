@@ -2,10 +2,6 @@ export function procesarFormulario(formulario) {
     const datosFormulario = new FormData(formulario)
     return Object.fromEntries(datosFormulario)
 }
-export function obtenerParametroId() {
-    const params = new URL(location.href).searchParams
-    return params.get('id')
-}
 export async function altaRegistro(ruta, metodo, datos) {
     try {
         const respuesta = await fetch(ruta, {

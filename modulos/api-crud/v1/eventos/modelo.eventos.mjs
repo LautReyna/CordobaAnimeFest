@@ -10,11 +10,11 @@ async function obtenerEventos(){
     }
 }
 
-async function obtenerEvento(idEvento){
+async function obtenerEvento(id){
     try{
         const resultado = await pool.query(
-            'SELECT * FROM evento WHERE idEvento=$1',
-            [idEvento]
+            'SELECT * FROM evento WHERE id=$1',
+            [id]
         )
         return resultado
     }catch(error){
@@ -26,23 +26,23 @@ async function obtenerEvento(idEvento){
 async function crearEvento(evento){
     try{
         const {
-            nombreEvento, 
+            nombre, 
             horaInicio, 
             horaFin, 
             estado, 
-            ubicacionEvento, 
-            descripcionEvento,
-            imagenEvento
+            ubicacion, 
+            descripcion,
+            imagen
         } = evento
         const resultado = await pool.query(
             `INSERT INTO evento
-                (nombreEvento, horaInicio, horaFin, estado, ubicacionEvento,
-                descripcionEvento, imagenEvento)
+                (nombre, horaInicio, horaFin, estado, ubicacion,
+                descripcion, imagen)
             VALUES
                 ($1,$2,$3,$4,$5,$6,$7)
-            RETURNING nombreEvento`,
-            [nombreEvento, horaInicio, horaFin, estado, ubicacionEvento,
-                descripcionEvento, imagenEvento]
+            RETURNING nombre`,
+            [nombre, horaInicio, horaFin, estado, ubicacion,
+                descripcion, imagen]
         )
         return resultado
     }catch(error){
@@ -51,30 +51,31 @@ async function crearEvento(evento){
     }
 }
 
-async function modificarEvento(evento){
+async function modificarEvento(id, evento ={}){
     try{
         const {
-            nombreEvento, 
+            nombre, 
             horaInicio, 
             horaFin, 
             estado, 
-            ubicacionEvento, 
-            descripcionEvento,
-            imagenEvento
+            ubicacion, 
+            descripcion,
+            imagen
         } = evento
         const resultado = await pool.query(
             `UPDATE evento
                 SET
-                    nombreEvento=$1,
+                    nombre=$1,
                     horaInicio=$2,
                     horaFin=$3,
                     estado=$4,
-                    ubicacionEvento=$5,
-                    descripcionEvento=$6,
-                    imagenEvento=$7
-                RETURNING nombreEvento`,
-            [nombreEvento, horaInicio, horaFin, estado, ubicacionEvento,
-                descripcionEvento, imagenEvento]
+                    ubicacion=$5,
+                    descripcion=$6,
+                    imagen=$7
+                WHERE id =$8
+                RETURNING nombre`,
+            [nombre, horaInicio, horaFin, estado, ubicacion,
+                descripcion, imagen, id]
         )
         return resultado
     }catch(error){
@@ -83,13 +84,13 @@ async function modificarEvento(evento){
     }
 }
 
-async function eliminarEvento(idEvento){
+async function eliminarEvento(id){
     try{
         const resultado = await pool.query(
             `DELETE FROM evento
-                WHERE idEvento=$1
-                RETURNING nombreEvento`,
-            [idEvento]
+                WHERE id=$1
+                RETURNING nombre`,
+            [id]
         )
         return resultado
     }catch(error){
