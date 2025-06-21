@@ -16,8 +16,9 @@ app.use(modulosApi)
 
 app.use('/autenticacion', rutasAutenticacion)
 
+app.use('/recursos', express.static('recursos'))
 app.use('/login', express.static('login'))
-
+app.use('/www', express.static('www'))
 app.use('/admin', verificarAcceso, express.static('admin'))
 
 app.listen(PUERTO)

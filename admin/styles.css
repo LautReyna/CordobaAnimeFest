@@ -1,0 +1,20 @@
+.descripcion {
+    max-height: 25px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 10px;
+  }
+  
+  .descripcion.expandida {
+    max-height: none;
+  }
+  
+  .boton {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    background-color: white;
+    color: #8f8f8f;
+    border: none;
+    cursor: pointer;
+  }

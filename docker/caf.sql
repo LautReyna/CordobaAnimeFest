@@ -25,15 +25,10 @@ CREATE TABLE eventoCaf(
     idCaf INT REFERENCES caf(id)
 );
 
-CREATE TABLE tienda(
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(50),
-    descripcion TEXT
-);
-
 CREATE TABLE stand(
     id SERIAL PRIMARY KEY,
-    idTienda INT REFERENCES tienda(id),
+    nombre VARCHAR(50),
+    descripcion TEXT,
     ubicacion VARCHAR(20),
     estado VARCHAR(20)
 );

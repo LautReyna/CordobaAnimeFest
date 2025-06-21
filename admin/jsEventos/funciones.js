@@ -30,7 +30,6 @@ export async function renderizarFormularioPorNombre(datosEventos, formulario){
     nombreEvento.addEventListener('input', handler)
 }
 
-
 export async function limpiarFormularioEventos(formulario) {
     try {
         formulario.nombre.value = ""
@@ -55,7 +54,12 @@ export async function renderizarListadoEventos(datosEventos) {
             filas += `
                 <tr>
                     <td scope="col">${evento.nombre}</td>
-                    <td scope="col">${evento.descripcion}</td>
+                    <td scope="col">
+                        <div class="descripcion">
+                            <p>${evento.descripcion}</p>
+                            <button class="boton">Mostrar más</button>
+                        </div>
+                    </td>
                     <td scope="col">${evento.ubicacion}</td>
                     <td scope="col">${evento.horainicio?.substring(0,5)}</td>
                     <td scope="col">${evento.horafin?.substring(0,5)}</td>
@@ -64,6 +68,13 @@ export async function renderizarListadoEventos(datosEventos) {
             `
         })
         contenedorEventos.innerHTML = filas
+        document.querySelectorAll('.boton').forEach((boton) => {
+            boton.addEventListener('click',(e) => {
+                const contenedor = e.target.closest('.descripcion')
+                contenedor.classList.toggle('expandida')
+                e.target.textContent = contenedor.classList.contains('expandida') ? 'Mostrar menos' : 'Mostrar más'
+            })
+        })
     } catch (error) {
         console.log(error)
     }
