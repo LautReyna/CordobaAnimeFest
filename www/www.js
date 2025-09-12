@@ -282,7 +282,7 @@ function cronogramaEventos(datosEventos){
     }
 }
 
-function modalMapa(datosEventos){
+function modalMapa(datosEventos, datosStands){
 
     function mostrarModalEventos(lugar, eventos){
         
@@ -324,6 +324,45 @@ function modalMapa(datosEventos){
         new bootstrap.Modal(modal).show()
     }
 
+    function mostrarModalStands(lugar, stands){
+        
+        const modal = document.querySelector('#modal-eventos')
+        
+        const modalTitle = modal.querySelector('.modal-title')
+        const modalBody = modal.querySelector('.modal-body')
+
+        modalTitle.textContent = lugar
+
+        modalBody.innerHTML = ''
+        if(stands.length > 0){
+
+            modalBody.innerHTML = `<div class="accordion accordion-flush" id="accordion-stands"><div>`
+            const accordion = modalBody.querySelector("#accordion-stands")
+
+            stands.forEach((stand, index)=>{
+                accordion.innerHTML += `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading${index}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
+                                ${stand.nombre}
+                            </button>
+                        </h2>
+                        <div id="collapse${index}" class="accordion-collapse collapse" aria-labelledby="heading${index}" data-bs-parent="#accordion-stands">
+                            <div class="accordion-body">
+                                <p>Descripción: ${stand.descripcion}</p>
+                                <p>Ubicación: ${stand.ubicacion}</p>
+                            </div>
+                        </div>
+                    </div>`
+            })
+            modalBody.innerHTML += `</div>`
+        }else{
+            modalBody.innerHTML = '<p>No se encuentran stands para este lugar</p>'
+        }
+
+        new bootstrap.Modal(modal).show()
+    }
+
     document.querySelectorAll('area[data-espacio]').forEach((area)=>{
         area.addEventListener('click', (e)=>{
             e.preventDefault()
@@ -331,15 +370,18 @@ function modalMapa(datosEventos){
             const lugar = area.dataset.espacio
 
             const eventosFiltrados = datosEventos.filter(e => e.ubicacion === lugar)
+            const standsFiltrados = datosStands.filter(e => e.ubicacion === lugar)
 
             console.log(lugar)
             mostrarModalEventos(lugar, eventosFiltrados)
+            mostrarModalStands(lugar, standsFiltrados)
         })
     })
 }
 
 const datosEventos = await obtenerRegistros('/api/v1/eventos')
+const datosStands = await obtenerRegistros('/api/v1/stands')
 carteleraEventos(datosEventos)
 carteleraMeet(datosEventos)
 cronogramaEventos(datosEventos)
-modalMapa(datosEventos)
+modalMapa(datosEventos, datosStands)

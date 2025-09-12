@@ -17,7 +17,6 @@ export async function altaRegistro(ruta, metodo, datos) {
         throw error
     }
 }
-
 export async function eliminarRegistro(ruta) {
     try {
         const respuesta = await fetch(ruta, {

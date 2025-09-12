@@ -1,3 +1,8 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
 .descripcion {
     max-height: 25px;
     overflow: hidden;

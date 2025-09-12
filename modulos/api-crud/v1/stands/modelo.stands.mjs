@@ -61,9 +61,9 @@ async function modificarStand(id, stand ={}){
                     descripcion=$2,
                     ubicacion=$3,
                     estado=$4
-                WHERE id =$8
+                WHERE id =$5
                 RETURNING nombre`,
-            [nombre, descripcion, ubicacion, estado]
+            [nombre, descripcion, ubicacion, estado, id]
         )
         return resultado
     }catch(error){
