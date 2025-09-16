@@ -2,8 +2,6 @@
 
 CREATE TABLE caf(
     id SERIAL PRIMARY KEY,
-    listaEventos JSON,
-    listStands JSON,
     fecha DATE,
     mapa TEXT
 );

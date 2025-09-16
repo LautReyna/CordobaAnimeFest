@@ -13,7 +13,7 @@ router.post('/', async (req, res)=> {
             'SELECT * FROM usuario WHERE nombre = $1',
             [nombre]
         )
-
+        
         if(resultado.rows.length === 0){
             return res.status(401).json({mensaje: "Usuario o contraseña incorrectos"})
         }
@@ -39,4 +39,10 @@ router.post('/', async (req, res)=> {
     }
 })
 
+router.post('/logout', (req,res)=>{
+    res.clearCookie('auth')
+    res.json({mensaje: 'sesion cerrada'})
+})
+
 export default router
+
