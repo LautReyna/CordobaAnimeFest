@@ -56,17 +56,33 @@ async function modificarUsuario(id, usuario ={}){
             contrasena,
             categoria
         } = usuario
-        const hashedPassword = await bcrypt.hash(contrasena, saltRounds)
-        const resultado = await pool.query(
-            `UPDATE usuario
-                SET
-                    nombre=$1,
-                    contrasena=$2,
-                    categoria=$3
-                WHERE id =$4
-                RETURNING nombre`,
-            [nombre, hashedPassword, categoria, id]
-        )
+
+        let hashedPassword = ''
+
+        if(contrasena && contrasena.trim() !== ''){
+            hashedPassword = await bcrypt.hash(contrasena, 10)
+        }
+
+        let query = `
+            UPDATE usuario
+            SET nombre=$1,
+                categoria=$2
+        `
+        const params = [nombre, categoria]
+
+        if(hashedPassword){
+            query +=`,
+                    contrasena=$3
+                WHERE id=$4
+                RETURNING nombre
+            `
+            params.push(hashedPassword, id)
+        }else{
+            query +=`WHERE id=$3 RETURNING nombre`
+            params.push(id)
+        }
+
+        const resultado = await pool.query(query, params)
         return resultado
     }catch(error){
         console.log(error)

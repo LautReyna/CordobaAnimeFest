@@ -139,7 +139,7 @@ function carteleraEventos(datosEventos) {
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                            <button type="button" class="btn btn-primary">Programar Alerta</button>
+                                            <button type="button" class="btn btn-primary" id="btn-notificacion">Programar Alerta</button>
                                         </div>
                                     </div>
                                 </div>

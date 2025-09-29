@@ -3,13 +3,13 @@ import {
     altaRegistro,
     obtenerRegistros,
     eliminarRegistro,
+    limpiarFormulario,
+    mostrarMensaje
 } from '../recursos/utilidades.js'
 import { 
     renderizarFormularioPorNombre,
     idStand,
-    limpiarFormularioStands,
-    renderizarListadoStands, 
-    mostrarMensaje
+    renderizarListadoStands
 } from './funciones.js'
 
 const formulario = document.getElementById('form-stand')
@@ -20,17 +20,6 @@ formulario.addEventListener('submit', async (stand) => {
     stand.preventDefault()
 
     const datosFormulario = procesarFormulario(formulario)
-
-    const campos = ['nombre', 'descripcion', 'ubicacion', 'estado']
-
-    const camposIncompletos = campos.filter(campo => {
-        return !datosFormulario[campo] || datosFormulario[campo].trim() === ''
-    })
-
-    if(camposIncompletos.length > 0){
-        mostrarMensaje(mensajes, `Complete los siguientes campos: ${camposIncompletos.join(', ')}`)
-        return
-    }
     
     if(!idStand){
         try{
@@ -42,11 +31,11 @@ formulario.addEventListener('submit', async (stand) => {
             const resultado = await respuesta.json()
             mostrarMensaje(mensajes, resultado.mensaje || 'Stand dado de alta correctamente')
 
-            limpiarFormularioStands(formulario)
-            const resActualizado = await obtenerRegistros('/api/v1/stands')
+            limpiarFormulario(formulario)
+            const resActualizado = await obtenerRegistros('/api/v1/stands/caf/activa')
             const standsActualizados = await resActualizado.json()
-            renderizarListadoStands(standsActualizados)
-            renderizarFormularioPorNombre(standsActualizados, formulario)
+            renderizarListadoStands(standsActualizados, 'contenedor-stands')
+            renderizarFormularioPorNombre(standsActualizados, formulario, mensajes)
         }catch(error){
             console.log(error)
             mostrarMensaje(mensajes, 'No se pudo dar de alta el registro')
@@ -63,11 +52,11 @@ formulario.addEventListener('submit', async (stand) => {
             const datos = await respuesta.json()
             mostrarMensaje(mensajes, datos.mensaje || 'Stand modificado correctamente')
 
-            limpiarFormularioStands(formulario)
-            const resActualizado = await obtenerRegistros('/api/v1/stands')
+            limpiarFormulario(formulario)
+            const resActualizado = await obtenerRegistros('/api/v1/stands/caf/activa')
             const standsActualizados = await resActualizado.json()
-            renderizarListadoStands(standsActualizados)
-            renderizarFormularioPorNombre(standsActualizados, formulario)
+            renderizarListadoStands(standsActualizados, 'contenedor-stands')
+            renderizarFormularioPorNombre(standsActualizados, formulario, mensajes)
             
         }catch(error){
             console.error(error)
@@ -88,7 +77,7 @@ botonEliminar.addEventListener('click', async (stand) => {
     }    
 
     try{
-        const respuesta = await obtenerRegistros('/api/v1/stands')
+        const respuesta = await obtenerRegistros('/api/v1/stands/caf/activa')
         const datosStands = await respuesta.json()
         const standEncontrado = datosStands.find(e => e.nombre.toLowerCase() === nombreIngresado.toLowerCase())
 
@@ -98,17 +87,18 @@ botonEliminar.addEventListener('click', async (stand) => {
         }
 
         if (confirm(`¿Eliminar el stand "${standEncontrado.nombre}"?`)) {
-            const eliminar = await eliminarRegistro(`/api/v1/stands/${standEncontrado.id}`)
+            const eliminar = await eliminarRegistro(`/api/v1/stands/${standEncontrado.idstand}`)
             const resultado = await eliminar.json()
 
             if (eliminar.ok) {
                 mostrarMensaje(mensajes, resultado.mensaje || 'Stand eliminado correctamente.')
                 
-                limpiarFormularioStands(formulario)
-                const resActualizado = await obtenerRegistros('/api/v1/stands')
+                limpiarFormulario(formulario)
+                const resActualizado = await obtenerRegistros('/api/v1/stands/caf/activa')
                 const standsActualizados = await resActualizado.json()
-                renderizarListadoStands(standsActualizados)
-                renderizarFormularioPorNombre(standsActualizados, formulario)
+                console.log(standsActualizados)
+                renderizarListadoStands(standsActualizados, 'contenedor-stands')
+                renderizarFormularioPorNombre(standsActualizados, formulario, mensajes)
             } else {
                 mostrarMensaje(mensajes, resultado.mensaje || 'No se pudo eliminar el stand.')
             }
@@ -119,6 +109,6 @@ botonEliminar.addEventListener('click', async (stand) => {
     }
 })
 
-const resultado = await obtenerRegistros('/api/v1/stands')
+const resultado = await obtenerRegistros('/api/v1/stands/caf/activa')
 const datosStands = await resultado.json()
-await renderizarFormularioPorNombre(datosStands, formulario)
+await renderizarFormularioPorNombre(datosStands, formulario, mensajes)

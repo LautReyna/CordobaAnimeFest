@@ -1,19 +1,8 @@
-export function limpiarFormularioUsuario(formulario) {
-    try {
-        formulario.nombre.value = ""
-        formulario.contrasena.value ="" 
-        formulario.categoria.value = ""
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
-}
-
 export function renderizarFormularioUsuario(datosUsuario){
     try {
         document.querySelector('#form-editar-usuario input[name="id"]').value = datosUsuario.id
         document.querySelector('#form-editar-usuario input[name="nombre"]').value = datosUsuario.nombre
-        document.querySelector('#form-editar-usuario input[name="contrasena"]').value = datosUsuario.contrasena
+        document.querySelector('#form-editar-usuario input[name="contrasena"]').value = ''
         document.querySelector('#form-editar-usuario select[name="categoria"]').value = datosUsuario.categoria
     } catch (error) {
         console.log(error)
@@ -29,7 +18,7 @@ export function renderizarListadoUsuario(datosUsuarios) {
             filas += `
                 <tr>
                     <td scope="col">${usuario.nombre}</td>
-                    <td scope="col">${'*'.repeat(usuario.contrasena.length)}</td>
+                    <td scope="col">${'*'.repeat(10)}</td>
                     <td scope="col">${usuario.categoria}</td>
                     <td scope="col">
                     <button 
@@ -97,11 +86,4 @@ export function mostrarContrasenaEditar(){
             })
         }
     })
-}
-
-export function mostrarMensaje(mensajes, texto, duracion = 3000){
-    mensajes.innerHTML = texto
-    setTimeout(()=>{
-        mensajes.innerHTML = ''
-    }, duracion)
 }

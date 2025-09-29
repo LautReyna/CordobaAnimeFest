@@ -3,7 +3,8 @@
 CREATE TABLE caf(
     id SERIAL PRIMARY KEY,
     fecha DATE,
-    mapa TEXT
+    mapa TEXT,
+    activa BOOLEAN
 );
 
 CREATE TABLE evento(
@@ -19,8 +20,8 @@ CREATE TABLE evento(
 
 CREATE TABLE eventoCaf(
     id SERIAL PRIMARY KEY,
-    idEvento INT REFERENCES evento(id),
-    idCaf INT REFERENCES caf(id)
+    idEvento INT REFERENCES evento(id) ON DELETE CASCADE,
+    idCaf INT REFERENCES caf(id) ON DELETE CASCADE
 );
 
 CREATE TABLE stand(
@@ -33,8 +34,8 @@ CREATE TABLE stand(
 
 CREATE TABLE standCaf(
     id SERIAL PRIMARY KEY,
-    idStand INT REFERENCES stand(id),
-    idCaf INT REFERENCES caf(id)
+    idStand INT REFERENCES stand(id) ON DELETE CASCADE,
+    idCaf INT REFERENCES caf(id) ON DELETE CASCADE
 );
 
 CREATE TABLE usuario(
@@ -51,6 +52,13 @@ CREATE TABLE alerta(
 
 CREATE TABLE auditoria(
     idUsuario INT REFERENCES usuario(id),
-    fechaHora TIMESTAMP,
+    fechaHora TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     ipTerminal VARCHAR(30)
 );
+
+CREATE TABLE suscripciones(
+    id SERIAL PRIMARY KEY,
+    endpoint TEXT UNIQUE,
+    data JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+)

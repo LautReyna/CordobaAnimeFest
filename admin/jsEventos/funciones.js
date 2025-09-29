@@ -1,6 +1,8 @@
+import { mostrarMensaje } from "../recursos/utilidades.js"
+
 export let idEvento = null
 
-export async function renderizarFormularioPorNombre(datosEventos, formulario){
+export async function renderizarFormularioPorNombre(datosEventos, formulario, mensajes){
     let nombreEvento = formulario.nombre
     
     nombreEvento.removeEventListener('input', nombreEvento._handler || (() => {}))
@@ -8,14 +10,12 @@ export async function renderizarFormularioPorNombre(datosEventos, formulario){
     const handler = () =>{
         const nombreBuscado = nombreEvento.value.trim().toLowerCase()
         const evento = datosEventos.find(e => e.nombre.toLowerCase() === nombreBuscado)
-    
         if(evento){
-            idEvento = evento.id
+            idEvento = evento.idevento
     
             formulario.nombre.value = evento.nombre
             formulario.descripcion.value = evento.descripcion
             formulario.ubicacion.value = evento.ubicacion
-            formulario.estado.value = evento.estado
             formulario.horaInicio.value = evento.horainicio
             formulario.horaFin.value = evento.horafin
             formulario.imagen.value = evento.imagen
@@ -30,59 +30,54 @@ export async function renderizarFormularioPorNombre(datosEventos, formulario){
     nombreEvento.addEventListener('input', handler)
 }
 
-export async function limpiarFormularioEventos(formulario) {
+export async function renderizarListadoEventos(datosEventos, contenedorId) {
     try {
-        formulario.nombre.value = ""
-        formulario.descripcion.value ="" 
-        formulario.ubicacion.value = ""
-        formulario.estado.value = 1
-        formulario.imagen.value = ""
-        formulario.horaInicio.value = ""
-        formulario.horaFin.value = ""
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
-}
-
-export async function renderizarListadoEventos(datosEventos) {
-    try {
-        const contenedorEventos = document.getElementById('contenedor-eventos')
+        const contenedorEventos = document.getElementById(contenedorId)
         let filas = ''
 
-        datosEventos.forEach((evento) => {
-            filas += `
+        if (!datosEventos || datosEventos.length === 0) {
+            filas = `
                 <tr>
-                    <td scope="col">${evento.nombre}</td>
-                    <td scope="col">
-                        <div class="descripcion">
-                            <p>${evento.descripcion}</p>
-                            <button class="boton">Mostrar más</button>
-                        </div>
+                    <td colspan="6" class="text-center text-muted">
+                        No hay eventos registrados
                     </td>
-                    <td scope="col">${evento.ubicacion}</td>
-                    <td scope="col">${evento.horainicio?.substring(0,5)}</td>
-                    <td scope="col">${evento.horafin?.substring(0,5)}</td>
-                    <td scope="col">${evento.estado}</td>
                 </tr>
             `
-        })
+        } else {
+            const ordenEstados = {'En Curso': 1, 'Por Iniciar': 2, 'Pendiente': 3, 'Finalizado': 4}
+            datosEventos.sort((a, b) => ordenEstados[a.estado] - ordenEstados[b.estado])
+
+            datosEventos.forEach((evento) => {
+                filas += `
+                    <tr>
+                        <td scope="col">${evento.nombre}</td>
+                        <td scope="col">
+                            <div class="descripcion">
+                                <p>${evento.descripcion}</p>
+                                <button class="boton">Mostrar más</button>
+                            </div>
+                        </td>
+                        <td scope="col">${evento.ubicacion}</td>
+                        <td scope="col">${evento.horainicio?.substring(0,5)}</td>
+                        <td scope="col">${evento.horafin?.substring(0,5)}</td>
+                        <td scope="col">${evento.estado}</td>
+                    </tr>
+                `
+            })
+        }
+
         contenedorEventos.innerHTML = filas
+
         document.querySelectorAll('.boton').forEach((boton) => {
-            boton.addEventListener('click',(e) => {
+            boton.addEventListener('click', (e) => {
                 const contenedor = e.target.closest('.descripcion')
                 contenedor.classList.toggle('expandida')
-                e.target.textContent = contenedor.classList.contains('expandida') ? 'Mostrar menos' : 'Mostrar más'
+                e.target.textContent = contenedor.classList.contains('expandida')
+                    ? 'Mostrar menos'
+                    : 'Mostrar más'
             })
         })
     } catch (error) {
         console.log(error)
     }
-}
-
-export async function mostrarMensaje(mensajes, texto, duracion = 3000){
-    mensajes.innerHTML = texto
-    setTimeout(()=>{
-        mensajes.innerHTML = ''
-    }, duracion)
 }

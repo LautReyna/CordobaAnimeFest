@@ -1,5 +1,53 @@
 import pool from '../../../../conexion/conexion.bd.mjs'
 
+async function vincularStandCaf(idStand, idCaf){
+    try{
+        await pool.query(
+            'INSERT INTO standCaf (idStand, idCaf) VALUES ($1, $2)',
+            [idStand, idCaf]
+        )
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}
+
+async function obtenerStandsCaf(idCaf){
+    try{
+        const resultado = await pool.query(
+            'SELECT * FROM stand INNER JOIN standCaf ON stand.id = standCaf.idStand WHERE standCaf.idCaf = $1',
+            [idCaf]
+        )
+        return resultado
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}
+
+async function obtenerStandsCafActiva(){
+    try{
+        const resultado = await pool.query(`
+            SELECT stand.id AS idstand,
+                   stand.nombre,
+                   stand.descripcion,
+                   stand.ubicacion,
+                   stand.estado,
+                   caf.id AS idcaf,
+                   caf.fecha,
+                   caf.mapa,
+                   caf.activa FROM stand 
+            INNER JOIN standCaf ON stand.id = standCaf.idStand 
+            INNER JOIN caf ON standCaf.idCaf = caf.id
+            WHERE caf.activa = true
+        `)
+        return resultado
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}
+
 async function obtenerStands(){
     try{
         const resultado = await pool.query('SELECT * FROM stand')
@@ -28,16 +76,15 @@ async function crearStand(stand){
         const {
             nombre, 
             descripcion,
-            ubicacion,
-            estado
+            ubicacion
         } = stand
         const resultado = await pool.query(
             `INSERT INTO stand
-                (nombre, descripcion, ubicacion, estado)
+                (nombre, descripcion, ubicacion)
             VALUES
-                ($1,$2,$3,$4)
-            RETURNING nombre`,
-            [nombre, descripcion, ubicacion, estado]
+                ($1,$2,$3)
+            RETURNING nombre, id`,
+            [nombre, descripcion, ubicacion]
         )
         return resultado
     }catch(error){
@@ -51,19 +98,17 @@ async function modificarStand(id, stand ={}){
         const {
             nombre, 
             descripcion,
-            ubicacion,
-            estado
+            ubicacion
         } = stand
         const resultado = await pool.query(
             `UPDATE stand
                 SET
                     nombre=$1,
                     descripcion=$2,
-                    ubicacion=$3,
-                    estado=$4
-                WHERE id =$5
+                    ubicacion=$3
+                WHERE id =$4
                 RETURNING nombre`,
-            [nombre, descripcion, ubicacion, estado, id]
+            [nombre, descripcion, ubicacion, id]
         )
         return resultado
     }catch(error){
@@ -88,6 +133,9 @@ async function eliminarStand(id){
 }
 
 export{
+    vincularStandCaf,
+    obtenerStandsCaf,
+    obtenerStandsCafActiva,
     obtenerStands,
     obtenerStand,
     crearStand,

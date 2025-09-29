@@ -4,6 +4,8 @@ import * as controlador from './controlador.stands.mjs'
 const rutasStands = express.Router()
 rutasStands.use(express.json())
 
+rutasStands.get('/api/v1/stands/caf/activa', controlador.obtenerStandsCafActiva)
+rutasStands.get('/api/v1/stands/caf/:idCaf', controlador.obtenerStandsCaf)
 rutasStands.get('/api/v1/stands', controlador.obtenerStands)
 rutasStands.get('/api/v1/stands/:id', controlador.obtenerStand)
 rutasStands.post('/api/v1/stands', controlador.crearStand)

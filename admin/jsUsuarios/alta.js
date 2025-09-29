@@ -3,12 +3,12 @@ import {
     altaRegistro,
     obtenerRegistros,
     eliminarRegistro,
+    mostrarMensaje,
+    limpiarFormulario
 } from '../recursos/utilidades.js'
 import { 
-    limpiarFormularioUsuario,
     renderizarFormularioUsuario,
     renderizarListadoUsuario, 
-    mostrarMensaje,
     mostrarContrasenaAlta,
     mostrarContrasenaEditar,
 } from './funciones.js'
@@ -30,7 +30,7 @@ formularioAlta.addEventListener('submit', async(e) =>{
         )
         const resultado = await respuesta.json()
         mostrarMensaje(mensajes, resultado.mensaje || 'Usuario dado de alta correctamente')
-        limpiarFormularioUsuario(formularioAlta)
+        limpiarFormulario(formularioAlta)
         
         const resActualizado = await obtenerRegistros('/api/v1/usuarios')
         const usuariosActualizados = await resActualizado.json()
@@ -67,12 +67,10 @@ formularioEditar.addEventListener('submit', async(e)=>{
             '/api/v1/usuarios/' + id,
             'PUT',
             datosFormulario
-        )
-        mostrarMensaje(mensajes, datos.mensaje || 'Usuario modificado correctamente')
-        
+        )        
         const resultado = await respuesta.json()
         mostrarMensaje(mensajes, resultado.mensaje || 'usuario modificado correctamente')
-        limpiarFormularioUsuario(formularioEditar)
+        limpiarFormulario(formularioEditar)
 
         const resActualizado = await obtenerRegistros('/api/v1/usuarios')
         const usuariosActualizados = await resActualizado.json()
@@ -100,7 +98,7 @@ botonEliminar.addEventListener('click', async (e) => {
             if (eliminar.ok) {
                 mostrarMensaje(mensajes, resultado.mensaje || 'Usuario eliminado correctamente.')
                 
-                limpiarFormularioUsuario(formularioEditar)
+                limpiarFormulario(formularioEditar)
                 const resActualizado = await obtenerRegistros('/api/v1/usuarios')
                 const usuariosActualizados = await resActualizado.json()
                 renderizarListadoUsuario(usuariosActualizados)

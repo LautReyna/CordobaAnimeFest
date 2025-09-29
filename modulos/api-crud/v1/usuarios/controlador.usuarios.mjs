@@ -61,7 +61,7 @@ async function modificarUsuario(req, res) {
             categoria
         } = req.body
         
-        if (!nombre || !contrasena || !categoria) {
+        if (!nombre || !categoria) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
         const resultado = await modelo.modificarUsuario(id, {

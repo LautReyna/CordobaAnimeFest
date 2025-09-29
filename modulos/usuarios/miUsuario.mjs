@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 
 const router = express.Router()
 
-router.get('/miUsuario', (req, res)=>{
+router.get('/', (req, res)=>{
     try{
         if(!req.cookies.auth){
             return res.status(401).json({mensaje: "No autenticado"})

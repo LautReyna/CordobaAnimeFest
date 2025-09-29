@@ -1,7 +1,13 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import pool from '../../../conexion/conexion.bd.mjs'
+import pool from '../../conexion/conexion.bd.mjs'
 import express from 'express'
+
+function getClientIp(req){
+    const xff = req.headers['x-forwarded-for'];
+    if (xff) return xff.split(',')[0].trim();
+    return req.ip || req.socket.remoteAddress || null;
+}
 
 const router = express.Router()
 
@@ -31,6 +37,12 @@ router.post('/', async (req, res)=> {
             {expiresIn: "1h"}
         )
 
+        const ip = getClientIp(req)
+        await pool.query(
+            'INSERT INTO auditoria (idUsuario, ipTerminal) VALUES ($1, $2)',
+            [usuario.id, ip]
+        )
+
         res.cookie("auth", token, {httpOnly: true})
         res.redirect("/admin")
     }catch(error){
@@ -45,4 +57,3 @@ router.post('/logout', (req,res)=>{
 })
 
 export default router
-

@@ -3,35 +3,30 @@ import {
     altaRegistro,
     obtenerRegistros,
     eliminarRegistro,
+    mostrarMensaje,
+    limpiarFormulario,
+    cancelarRegistro
 } from '../recursos/utilidades.js'
 import { 
     renderizarFormularioPorNombre,
     idEvento,
-    limpiarFormularioEventos,
-    renderizarListadoEventos, 
-    mostrarMensaje
+    renderizarListadoEventos
 } from './funciones.js'
 
 const formulario = document.getElementById('form-evento')
 const mensajes = document.getElementById('mensajes')
 const botonEliminar = document.getElementById('eliminar-evento')
+const botonCancelar = document.getElementById('cancelar-evento')
 
-formulario.addEventListener('submit', async (evento) => {
-    evento.preventDefault()
+formulario.addEventListener('submit', async (e) => {
+    e.preventDefault()
 
     const datosFormulario = procesarFormulario(formulario)
-
-    const campos = ['nombre', 'descripcion', 'ubicacion', 'estado', 'imagen', 'horaInicio', 'horaFin']
-
-    const camposIncompletos = campos.filter(campo => {
-        return !datosFormulario[campo] || datosFormulario[campo].trim() === ''
-    })
-
-    if(camposIncompletos.length > 0){
-        mostrarMensaje(mensajes, `Complete los siguientes campos: ${camposIncompletos.join(', ')}`)
-        return
-    }
     
+    if(datosFormulario.nombre){
+        datosFormulario.nombre = datosFormulario.nombre.trimEnd()
+    }
+
     if(!idEvento){
         try{
             const respuesta = await altaRegistro(
@@ -42,11 +37,11 @@ formulario.addEventListener('submit', async (evento) => {
             const resultado = await respuesta.json()
             mostrarMensaje(mensajes, resultado.mensaje || 'Evento dado de alta correctamente')
 
-            limpiarFormularioEventos(formulario)
-            const resActualizado = await obtenerRegistros('/api/v1/eventos')
+            limpiarFormulario(formulario)
+            const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
             const eventosActualizados = await resActualizado.json()
-            renderizarListadoEventos(eventosActualizados)
-            renderizarFormularioPorNombre(eventosActualizados, formulario)
+            renderizarListadoEventos(eventosActualizados, 'contenedor-eventos')
+            renderizarFormularioPorNombre(eventosActualizados, formulario, mensajes)
         }catch(error){
             console.log(error)
             mostrarMensaje(mensajes, 'No se pudo dar de alta el registro')
@@ -63,11 +58,11 @@ formulario.addEventListener('submit', async (evento) => {
             const datos = await respuesta.json()
             mostrarMensaje(mensajes, datos.mensaje || 'Evento modificado correctamente')
 
-            limpiarFormularioEventos(formulario)
-            const resActualizado = await obtenerRegistros('/api/v1/eventos')
+            limpiarFormulario(formulario)
+            const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
             const eventosActualizados = await resActualizado.json()
-            renderizarListadoEventos(eventosActualizados)
-            renderizarFormularioPorNombre(eventosActualizados, formulario)
+            renderizarListadoEventos(eventosActualizados, 'contenedor-eventos')
+            renderizarFormularioPorNombre(eventosActualizados, formulario, mensajes)
             
         }catch(error){
             console.error(error)
@@ -77,8 +72,8 @@ formulario.addEventListener('submit', async (evento) => {
     
 })
 
-botonEliminar.addEventListener('click', async (evento) => {
-    evento.preventDefault()
+botonEliminar.addEventListener('click', async (e) => {
+    e.preventDefault()
 
     const nombreIngresado = formulario.nombre.value
 
@@ -88,7 +83,7 @@ botonEliminar.addEventListener('click', async (evento) => {
     }    
 
     try{
-        const respuesta = await obtenerRegistros('/api/v1/eventos')
+        const respuesta = await obtenerRegistros('/api/v1/eventos/caf/activa')
         const datosEventos = await respuesta.json()
         const eventoEncontrado = datosEventos.find(e => e.nombre.toLowerCase() === nombreIngresado.toLowerCase())
 
@@ -98,17 +93,17 @@ botonEliminar.addEventListener('click', async (evento) => {
         }
 
         if (confirm(`¿Eliminar el evento "${eventoEncontrado.nombre}"?`)) {
-            const eliminar = await eliminarRegistro(`/api/v1/eventos/${eventoEncontrado.id}`)
+            const eliminar = await eliminarRegistro(`/api/v1/eventos/${eventoEncontrado.idevento}`)
             const resultado = await eliminar.json()
 
             if (eliminar.ok) {
                 mostrarMensaje(mensajes, resultado.mensaje || 'Evento eliminado correctamente.')
                 
-                limpiarFormularioEventos(formulario)
-                const resActualizado = await obtenerRegistros('/api/v1/eventos')
+                limpiarFormulario(formulario)
+                const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
                 const eventosActualizados = await resActualizado.json()
-                renderizarListadoEventos(eventosActualizados)
-                renderizarFormularioPorNombre(eventosActualizados, formulario)
+                renderizarListadoEventos(eventosActualizados, 'contenedor-eventos')
+                renderizarFormularioPorNombre(eventosActualizados, formulario, mensajes)
             } else {
                 mostrarMensaje(mensajes, resultado.mensaje || 'No se pudo eliminar el evento.')
             }
@@ -119,6 +114,48 @@ botonEliminar.addEventListener('click', async (evento) => {
     }
 })
 
-const resultado = await obtenerRegistros('/api/v1/eventos')
+botonCancelar.addEventListener('click', async (e) => {
+    e.preventDefault()
+    const nombreIngresado = formulario.nombre.value
+
+    if(!nombreIngresado){
+        mostrarMensaje(mensajes, 'Ingrese el nombre del evento a cancelar.')
+        return
+    }
+
+    try{
+        const respuesta = await obtenerRegistros('/api/v1/eventos/caf/activa')
+        const datosEventos = await respuesta.json()
+        const eventoEncontrado = datosEventos.find(e => e.nombre.toLowerCase() === nombreIngresado.toLowerCase())
+
+        console.log(eventoEncontrado)
+        if (!eventoEncontrado) {
+            mostrarMensaje(mensajes, 'No se encontró un evento con ese nombre.')
+            return;
+        }
+
+        if (confirm(`Cancelar el evento "${eventoEncontrado.nombre}"?`)) {
+            const cancelar = await cancelarRegistro(`/api/v1/eventos/cancelar/${eventoEncontrado.idevento}`)
+            const resultado = await cancelar.json()
+
+            if (cancelar.ok) {
+                mostrarMensaje(mensajes, resultado.mensaje || 'Evento cancelado correctamente.')
+                
+                limpiarFormulario(formulario)
+                const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
+                const eventosActualizados = await resActualizado.json()
+                renderizarListadoEventos(eventosActualizados, 'contenedor-eventos')
+                renderizarFormularioPorNombre(eventosActualizados, formulario, mensajes)
+            } else {
+                mostrarMensaje(mensajes, resultado.mensaje || 'No se pudo eliminar el evento.')
+            }
+        } 
+    }catch(error){
+      console.log(error)
+      mostrarMensaje(mensajes, 'No se pudo finalizar la caf')
+    }
+})
+
+const resultado = await obtenerRegistros('/api/v1/eventos/caf/activa')
 const datosEventos = await resultado.json()
-await renderizarFormularioPorNombre(datosEventos, formulario)
+await renderizarFormularioPorNombre(datosEventos, formulario, mensajes)
