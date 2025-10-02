@@ -1,83 +1,44 @@
-import * as modelo from './modelo.alertas.mjs'
+import { upsertAlertaUsuario, listarAlertasUsuario, eliminarAlertaUsuario } from './modelo.alertas.mjs'
 
-async function obtenerAlertas(req, res) {
-    try {
-        const resultado = await modelo.obtenerAlertas();
-        if (resultado.rows.length > 0) {
-            res.json(resultado.rows)
-        } else {
-            res.status(404).json({ mensaje: 'Alertas no encontrados' })
+export async function crearOActualizar(req, res){
+    try{
+        const { endpoint, idEvento, modo } = req.body || {}
+        if(!endpoint || !idEvento){
+            return res.status(400).json({ mensaje: 'endpoint e idEvento son requeridos' })
         }
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ mensaje: 'Error en el servidor' })
+        const result = await upsertAlertaUsuario(endpoint, Number(idEvento), modo)
+        res.json({ mensaje: result.actualizado ? 'Alerta actualizada' : 'Alerta creada', id: result.id })
+    }catch(error){
+        console.error('crearOActualizar', error)
+        res.status(error.status || 500).json({ mensaje: error.message || 'Error servidor' })
     }
 }
 
-async function obtenerAlerta(req, res) {
-    try {
+export async function listar(req, res){
+    try{
+        const { endpoint } = req.query
+        if(!endpoint) return res.status(400).json({ mensaje: 'endpoint requerido' })
+        const rows = await listarAlertasUsuario(endpoint)
+        res.json(rows)
+    }catch(error){
+        console.error('listar', error)
+        res.status(500).json({ mensaje: 'Error servidor' })
+    }
+}
+
+export async function eliminar(req, res){
+    try{
         const { id } = req.params
-        const resultado = await modelo.obtenerAlerta(id)
-        if (resultado.rows.length > 0) {
-            res.json(resultado.rows)
-        } else {
-            res.status(404).json({ mensaje: 'Alerta no encontrado' })
-        }
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ mensaje: 'Error en el servidor' })
+        const { endpoint } = req.body || {}
+        if(!endpoint) return res.status(400).json({ mensaje: 'endpoint requerido' })
+        const ok = await eliminarAlertaUsuario(Number(id), endpoint)
+        if(!ok) return res.status(404).json({ mensaje: 'No encontrada' })
+        res.json({ mensaje: 'Alerta eliminada' })
+    }catch(error){
+        console.error('eliminar', error)
+        res.status(500).json({ mensaje: 'Error servidor' })
     }
 }
 
-async function crearAlerta(req, res) {
-    try {
-        const { hora } = req.body
-        if (!hora) {
-            return res.status(400).json({ mensaje: 'Datos incompletos' })
-        }
-        const resultado = await modelo.crearAlerta({
-            hora
-        })
-        const { hora: horaCreado } = resultado.rows[0]
-        res.json({ mensaje: `Alerta para la hora ${horaCreado} dado de alta` })
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ mensaje: 'Error en el servidor' })
-    }
-}
 
-async function modificarAlerta(req, res) {
-    try {
-        const { id } = req.params
-        const { hora } = req.body
-        if (!id || !hora) {
-            return res.status(400).json({ mensaje: 'Datos incompletos' })
-        }
-        const resultado = await modelo.modificarAlerta({
-            id,
-            hora
-        })
-        const { hora: horaModificada } = resultado.rows[0]
-        res.json({ mensaje: `Alerta a la hora ${horaModificada} modificado` })
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ mensaje: 'Error en el servidor' })
-    }
-}
 
-async function eliminarAlerta(req, res) {
-    try {
-        const { id } = req.params
-        const resultado = await modelo.eliminarAlerta(id)
-        if (resultado.rows.length > 0) {
-            const { hora: horaEliminada } = resultado.rows[0]
-            res.status(200).json({ mensaje: `Alerta para la hora: ${horaEliminada} eliminada` })
-        } else {
-            res.status(404).json({ mensaje: 'Alumno no encontrado' })
-        }
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ mensaje: 'Error en el servidor' })
-    }
-}
-export { obtenerAlerta, obtenerAlertas, crearAlerta, modificarAlerta, eliminarAlerta }

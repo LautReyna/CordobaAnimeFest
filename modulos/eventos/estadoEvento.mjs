@@ -1,29 +1,30 @@
 import cron from 'node-cron'
 import webpush from 'web-push'
 import pool from '../../conexion/conexion.bd.mjs'
+import { sendNotificationForEvent } from '../notificaciones/servicio.mjs'
 
-async function sendNotificationToAll(payloadObj){
-    try{
-        const { rows } = await pool.query('SELECT id, data FROM suscripciones')
-        const subs = rows.map(r => r.data)
-        const payload = JSON.stringify(payloadObj)
+// async function sendNotificationToAll(payloadObj){
+//     try{
+//         const { rows } = await pool.query('SELECT id, data FROM suscripciones')
+//         const subs = rows.map(r => r.data)
+//         const payload = JSON.stringify(payloadObj)
 
-        await Promise.all(subs.map(async sub => {
-            try{
-                await webpush.sendNotification(sub, payload)
-            }catch(error){
-                // limpiar suscripciones validas
-                if(error.statusCode === 410 || error.statusCode === 404){
-                    await pool.query('DELETE FROM suscripciones WHERE endpoint = $1', [sub.endpoint])
-                }else{
-                    console.error('Error push a', sub.endpoint, error.statusCode || error)
-                }
-            }
-        }))
-    }catch(error){
-        console.error('Error enviando notificaciones', error)
-    }
-}
+//         await Promise.all(subs.map(async sub => {
+//             try{
+//                 await webpush.sendNotification(sub, payload)
+//             }catch(error){
+//                 // limpiar suscripciones validas
+//                 if(error.statusCode === 410 || error.statusCode === 404){
+//                     await pool.query('DELETE FROM suscripciones WHERE endpoint = $1', [sub.endpoint])
+//                 }else{
+//                     console.error('Error push a', sub.endpoint, error.statusCode || error)
+//                 }
+//             }
+//         }))
+//     }catch(error){
+//         console.error('Error enviando notificaciones', error)
+//     }
+// }
 
 // // notificaiones push
 // async function notificarEvento(evento, estadoNuevo) {
@@ -93,15 +94,15 @@ async function actualizarEstadosEventos(io) {
             // notifica por push a todas las suscripciones
             for(const row of res1.rows){
                 console.log('Notificando evento por iniciar', row.nombre)
-                await sendNotificationToAll({ title: 'Evento por iniciar', body: `El evento "${row.nombre}" esta por iniciar.`})
+                await sendNotificationForEvent(row.id, 'Por Iniciar', { title: 'Evento por iniciar', body: `El evento "${row.nombre}" esta por iniciar.`, url: '/www/index.html' })
             }
             for(const row of res2.rows){
                 console.log('Notificando evento en curso', row.nombre)
-                await sendNotificationToAll({ title: 'Evento en curso', body: `El evento "${row.nombre}" esta en curso.`})
+                await sendNotificationForEvent(row.id, 'En Curso', { title: 'Evento en curso', body: `El evento "${row.nombre}" esta en curso.`, url: '/www/index.html' })
             }
             for(const row of res3.rows){
                 console.log('Notificando evento finalizado', row.nombre)
-                await sendNotificationToAll({ title: 'Evento finalizado', body: `El evento "${row.nombre}" finalizo.`})
+                await sendNotificationForEvent(row.id, 'Finalizado', { title: 'Evento finalizado', body: `El evento "${row.nombre}" finalizo.`, url: '/www/index.html' })
             }
 
         }

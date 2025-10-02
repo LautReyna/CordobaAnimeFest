@@ -14,6 +14,7 @@ import routerUsuario from './modulos/usuarios/miUsuario.mjs'
 import routerAuditoria from './modulos/seguridad/auditoria.mjs'
 import routerCaf from './modulos/caf/caf.mjs'
 import routerNotificaciones from './modulos/notificaciones/notificaciones.mjs'
+import routerContacto from './modulos/contacto/contacto.mjs'
 import {verificarAcceso, verificarRol} from './modulos/seguridad/auth.mjs'
 
 import startEstadoEvento from './modulos/eventos/estadoEvento.mjs'
@@ -33,6 +34,7 @@ app.use('/miUsuario', routerUsuario)
 app.use('/auditoria', routerAuditoria)
 app.use('/caf', routerCaf)
 app.use('/notificaciones', routerNotificaciones)
+app.use('/contacto', routerContacto)
 
 app.use('/recursos', express.static('recursos'))
 app.use('/login',(req, res, next)=>{res.clearCookie('auth'), express.static('login')(req, res, next)})

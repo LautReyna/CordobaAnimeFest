@@ -1,86 +1,32 @@
 import pool from '../../../../conexion/conexion.bd.mjs'
 
-async function obtenerAlertas() {
-    try {
-        const resultado = await pool.query('SELECT * FROM alertas')
-        return resultado
-    } catch (error) {
-        console.log(error)
-        throw error
+export async function upsertAlertaUsuario(endpoint, idEvento, modo){
+    const modoValido = ['todos','por_iniciar','en_curso'].includes(modo) ? modo : 'todos'
+    const s = await pool.query('SELECT 1 FROM suscripciones WHERE endpoint=$1',[endpoint])
+    if(s.rowCount === 0){
+        const err = new Error('Suscripcion no encontrada para endpoint')
+        err.status = 404
+        throw err
     }
+    const exist = await pool.query('SELECT id FROM alerta WHERE endpoint=$1 AND idEvento=$2',[endpoint, idEvento])
+    if(exist.rowCount > 0){
+        const id = exist.rows[0].id
+        await pool.query('UPDATE alerta SET modo=$1 WHERE id=$2',[modoValido, id])
+        return { id, actualizado: true }
+    }
+    const ins = await pool.query('INSERT INTO alerta(endpoint, idEvento, modo) VALUES($1,$2,$3) RETURNING id',[endpoint, idEvento, modoValido])
+    return { id: ins.rows[0].id, creado: true }
 }
 
-async function obtenerAlerta(id) {
-    try {
-        const resultado = await pool.query(
-            'SELECT * FROM alertas WHERE id=$1',
-            [id]
-        )
-        return resultado
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
+export async function listarAlertasUsuario(endpoint){
+    const r = await pool.query('SELECT id, idEvento, modo, created_at FROM alerta WHERE endpoint=$1 ORDER BY created_at DESC',[endpoint])
+    return r.rows
 }
 
-async function crearAlerta(alerta) {
-    try {
-        const { hora } = alerta
-        const resultado = await pool.query(
-            `
-            INSERT INTO alertas
-                (hora)
-            VALUES
-                ($1)
-            RETURNING id, hora
-        `,
-            [hora]
-        )
-        return resultado
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
+export async function eliminarAlertaUsuario(id, endpoint){
+    const del = await pool.query('DELETE FROM alerta WHERE id=$1 AND endpoint=$2 RETURNING id',[id, endpoint])
+    return del.rowCount > 0
 }
 
-async function modificarAlerta(alerta) {
-    try {
-        const { id, hora } = alerta
-        const resultado = await pool.query(
-            `UPDATE alertas
-                SET 
-                    hora=$1
-                    WHERE id=$2
-                RETURNING id, hora
-            `,
-            [hora, id]
-        )
-        return resultado
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
-}
 
-async function eliminarAlerta(id) {
-    try {
-        const resultado = await pool.query(
-            `DELETE FROM alertas 
-                WHERE id=$1
-                RETURNING id, hora
-            `,
-            [id]
-        )
-        return resultado
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
-}
-export {
-    obtenerAlertas,
-    obtenerAlerta,
-    crearAlerta,
-    modificarAlerta,
-    eliminarAlerta,
-}
+

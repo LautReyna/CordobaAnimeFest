@@ -143,7 +143,7 @@ export async function cambiarComboBox(datosCaf, callback){
       cb.addEventListener("change", async () => {
         const idCaf = cb.value
         const caf = datosCaf.find(c => c.id == idCaf)
-        callback(idCaf, caf, datosCaf)
+        callback(idCaf, caf)
       })
     })
   }catch(error){
@@ -151,7 +151,7 @@ export async function cambiarComboBox(datosCaf, callback){
   }
 }
 
-export async function mostrarEventosSegunCaf(idCaf, cafSeleccionada, datosCaf) {
+export async function mostrarEventosSegunCaf(idCaf, cafSeleccionada) {
   const sectionGestor = document.getElementById('section-gestor')
   const sectionPasada = document.getElementById('section-pasada')
 
@@ -170,7 +170,7 @@ export async function mostrarEventosSegunCaf(idCaf, cafSeleccionada, datosCaf) {
   }
 }
 
-export async function mostrarStandsSegunCaf(idCaf, cafSeleccionada, datosCaf) {
+export async function mostrarStandsSegunCaf(idCaf, cafSeleccionada) {
   const sectionGestor = document.getElementById('section-gestor')
   const sectionPasada = document.getElementById('section-pasada')
 

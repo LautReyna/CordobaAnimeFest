@@ -47,7 +47,10 @@ CREATE TABLE usuario(
 
 CREATE TABLE alerta(
     id SERIAL PRIMARY KEY,
-    hora TIME
+    idEvento INT REFERENCES evento(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL,
+    modo VARCHAR(20) CHECK (modo IN ('todos','por_iniciar','en_curso')),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE auditoria(
