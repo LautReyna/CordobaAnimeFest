@@ -45,20 +45,24 @@ async function obtenerCafActiva(req, res){
 
 async function crearCaf(req, res) {
     try {
-        const {
-            fecha,
-            mapa
-        } = req.body
-        if (!fecha || !mapa) {
+        const { fecha } = req.body
+
+        const fileName = req.file? req.file.filename : null
+        
+        console.log(fileName)
+        if (!fecha || !fileName) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
         const resultado = await modelo.crearCaf({
             fecha, 
-            mapa
+            mapa: fileName 
         })
-        const { fecha: fechaCreada } = resultado.rows[0]
+        const { id, fecha: fechaCreada } = resultado.rows[0]
         const fechaFormateada = new Date(fechaCreada).toISOString().slice(0,10)
-        res.json({ mensaje: `Caf ${fechaFormateada} dado de alta` })
+        res.json({ 
+            id,
+            mensaje: `Caf ${fechaFormateada} dado de alta` 
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({ mensaje: 'Error en el servidor' })
@@ -68,17 +72,15 @@ async function crearCaf(req, res) {
 async function modificarCaf(req, res) {
     try {
         const { id } = req.params
-        const {
-            fecha,
-            mapa
-        } = req.body
+        const { fecha } = req.body
+        const fileName = req.file ? req.file.filename : null
         
-        if (!fecha || !mapa) {
+        if (!fecha || !fileName) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
         const resultado = await modelo.modificarCaf(id, {
             fecha, 
-            mapa
+            mapa: fileName
         })
         const { fecha: fechaModificada } = resultado.rows[0]
         const fechaFormateada = new Date(fechaModificada).toISOString().slice(0,10)

@@ -11,16 +11,17 @@ export async function renderizarFormularioPorNombre(datosEventos, formulario, me
         const nombreBuscado = nombreEvento.value.trim().toLowerCase()
         const evento = datosEventos.find(e => e.nombre.toLowerCase() === nombreBuscado)
         if(evento){
-            idEvento = evento.idevento
+            idEvento = evento.id
     
             formulario.nombre.value = evento.nombre
             formulario.descripcion.value = evento.descripcion
-            formulario.ubicacion.value = evento.ubicacion
+            formulario.ubicacion.value = evento.idzona
             formulario.horaInicio.value = evento.horainicio
             formulario.horaFin.value = evento.horafin
-            formulario.imagen.value = evento.imagen
+            // No establecemos el valor del campo de archivo por seguridad
+            // El usuario puede subir una nueva imagen o mantener la actual
     
-            mostrarMensaje(mensajes, `Se encontro un evento con este nombre: ${formulario.nombre.value}`)
+            mostrarMensaje(mensajes, `Se encontró un evento con este nombre: ${formulario.nombre.value}`, 'info')
         }else{
             idEvento = null
         }
@@ -57,7 +58,7 @@ export async function renderizarListadoEventos(datosEventos, contenedorId) {
                                 <button class="boton">Mostrar más</button>
                             </div>
                         </td>
-                        <td scope="col">${evento.ubicacion}</td>
+                        <td scope="col">${evento.nombrezona}</td>
                         <td scope="col">${evento.horainicio?.substring(0,5)}</td>
                         <td scope="col">${evento.horafin?.substring(0,5)}</td>
                         <td scope="col">${evento.estado}</td>
@@ -81,3 +82,4 @@ export async function renderizarListadoEventos(datosEventos, contenedorId) {
         console.log(error)
     }
 }
+

@@ -1,40 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - CAF</title>
+    <meta name="description" content="Panel de administración para Córdoba Anime Fest">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="./jsAdmin/alta.js"></script>
     <script type="module" src="./jsAdmin/index.js"></script>
-    <title>CAF</title>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg w-100">
-            <div class="container-fluid">
-                <a href="/admin" class="navbar-brand">
-                    <img src="/recursos/logoCAF.png" style="width: 75px;" alt="">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container">
+                <a href="/admin" class="navbar-brand d-flex align-items-center">
+                    <img src="/recursos/logoCAF.png" alt="CAF Logo" class="me-2" style="width: 50px; height: 50px;">
+                    <span class="fw-bold fs-4">Panel Admin - CAF</span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarcollapse" aria-controls="navbarcollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarcollapse" aria-controls="navbarcollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarcollapse">
                     <ul class="navbar-nav ms-auto" id="enlaces">
-                        
+                        <!-- Enlaces dinámicos -->
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    <section>
-        <div class="d-flex justify-content-center mt-5" id="mensajes"></div>
-        <div class="mt-5" id="mensaje-bienvenida"></div>
-        <div id="contenedor-caf"></div>
+    <main class="py-4">
+        <div class="container">
+            <!-- Mensajes de estado -->
+            <div class="d-flex justify-content-center mt-3" id="mensajes"></div>
+            
+            <!-- Mensaje de bienvenida -->
+            <div class="mt-4" id="mensaje-bienvenida"></div>
+            
+            <!-- Contenedor principal de CAF -->
+            <div id="contenedor-caf"></div>
+        </div>
+    </main>
+
+        <!-- Modal para crear zonas con image-map.net -->
+        <div class="modal fade" id="modal-crear-zonas" tabindex="-1" aria-labelledby="modal-crear-zonas-label" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-bold" id="modal-crear-zonas-label">
+                            <i class="bi bi-geo-alt me-2"></i> Crear Zonas del Mapa
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Instrucciones -->
+                        <div class="alert alert-info border-0 shadow-sm">
+                            <h6 class="fw-bold mb-3">
+                                <i class="bi bi-info-circle me-2"></i> 
+                                Instrucciones paso a paso:
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ol class="mb-0">
+                                        <li class="mb-2">
+                                            <strong>Sube tu mapa</strong> en 
+                                            <a href="https://www.image-map.net/" target="_blank" class="btn btn-sm btn-outline-primary ms-1">
+                                                <i class="bi bi-box-arrow-up-right me-1"></i>image-map.net
+                                            </a>
+                                        </li>
+                                        <li class="mb-2"><strong>Crea las zonas</strong> dibujando polígonos sobre las áreas</li>
+                                        <li class="mb-2"><strong>Copia el código HTML</strong> generado</li>
+                                    </ol>
+                                </div>
+                                <div class="col-md-6">
+                                    <ol start="4" class="mb-0">
+                                        <li class="mb-2"><strong>Pega el código</strong> en el área de texto</li>
+                                        <li class="mb-2"><strong>Procesa las zonas</strong> automáticamente</li>
+                                        <li class="mb-2"><strong>Crea la CAF</strong> con todas las zonas</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulario para pegar coordenadas -->
+                        <div class="mb-3">
+                            <label for="codigo-html-zonas" class="form-label">
+                                <i class="bi bi-code-square"></i> Código HTML de image-map.net
+                            </label>
+                            <textarea 
+                                id="codigo-html-zonas" 
+                                class="form-control" 
+                                rows="8" 
+                                placeholder="Pega aquí el código HTML que copiaste de image-map.net..."
+                                style="font-family: monospace; font-size: 12px;">
+                            </textarea>
+                            <div class="form-text">
+                                <i class="bi bi-lightbulb"></i> 
+                                <strong>Tip:</strong> El código debe contener elementos &lt;area&gt; con coordenadas.<br>
+                                <i class="bi bi-info-circle"></i> 
+                                <strong>Nota:</strong> Si alguna zona no tiene shape definido, se usará 'rect' automáticamente.
+                            </div>
+                        </div>
+
+                        <!-- Vista previa de zonas -->
+                        <div id="vista-previa-zonas" class="d-none">
+                            <h6><i class="bi bi-eye"></i> Vista Previa de Zonas:</h6>
+                            <div id="lista-zonas" class="list-group mb-3"></div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary" id="btn-procesar-zonas">
+                                <i class="bi bi-gear"></i> Procesar Zonas
+                            </button>
+                            <button type="button" class="btn btn-success d-none" id="btn-crear-caf-con-zonas">
+                                <i class="bi bi-check-circle"></i> Crear CAF con Zonas
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="btn-limpiar-zonas">
+                                <i class="bi bi-trash"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="modal-modificar-caf" tabindex="-1" aria-labelledby="modal-modificar-caf-label" aria-hidden="true">
             <div class="modal-dialog">
@@ -52,8 +145,11 @@
                             </div>
                             <div class="mb-3">
                                 <label for="mapa">Mapa</label>
-                                <input type="text" class="form-control" name="mapa">
+                                <input type="file" class="form-control" name="mapa" accept="image/*">
                             </div>
+                            <button type="button" class="btn btn-info" id="btn-gestionar-zonas-modificar">
+                                <i class="bi bi-geo-alt"></i> Gestionar Zonas
+                            </button>
                             <button type="submit" class="btn btn-primary">Modificar</button>
                             <button type="button" class="btn btn-danger">Salir</button>
                         </form>
@@ -61,6 +157,82 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal para modificar zonas de CAF -->
+        <div class="modal fade" id="modal-modificar-zonas" tabindex="-1" aria-labelledby="modal-modificar-zonas-label" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-modificar-zonas-label">Gestionar Zonas de CAF</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Zonas existentes -->
+                        <div class="mb-4">
+                            <h6><i class="bi bi-list-check"></i> Zonas Actuales:</h6>
+                            <div id="lista-zonas-existentes" class="list-group mb-3"></div>
+                        </div>
+
+                        <!-- Opciones -->
+                        <div class="mb-4">
+                            <h6><i class="bi bi-gear"></i> Opciones:</h6>
+                            <div class="d-flex gap-2 mb-3">
+                                <button type="button" class="btn btn-warning" id="btn-actualizar-zonas">
+                                    <i class="bi bi-arrow-clockwise"></i> Actualizar Zonas
+                                </button>
+                                <button type="button" class="btn btn-success" id="btn-mantener-zonas">
+                                    <i class="bi bi-check-circle"></i> Mantener Zonas Actuales
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Formulario para nuevas zonas (oculto inicialmente) -->
+                        <div id="formulario-nuevas-zonas" class="d-none">
+                            <h6><i class="bi bi-plus-circle"></i> Procesar Nuevas Zonas:</h6>
+                            
+                            <div class="mb-3">
+                                <label for="codigo-html-zonas-modificar" class="form-label">
+                                    <i class="bi bi-code-square"></i> Código HTML de image-map.net
+                                </label>
+                                <textarea 
+                                    id="codigo-html-zonas-modificar" 
+                                    class="form-control" 
+                                    rows="6" 
+                                    placeholder="Pega aquí el código HTML que copiaste de image-map.net..."
+                                    style="font-family: monospace; font-size: 12px;">
+                                </textarea>
+                                <div class="form-text">
+                                    <i class="bi bi-lightbulb"></i> 
+                                    <strong>Tip:</strong> El código debe contener elementos &lt;area&gt; con coordenadas.<br>
+                                    <i class="bi bi-info-circle"></i> 
+                                    <strong>Nota:</strong> Si alguna zona no tiene shape definido, se usará 'rect' automáticamente.
+                                </div>
+                            </div>
+
+                            <!-- Vista previa de nuevas zonas -->
+                            <div id="vista-previa-zonas-modificar" class="d-none">
+                                <h6><i class="bi bi-eye"></i> Vista Previa de Nuevas Zonas:</h6>
+                                <div id="lista-zonas-modificar" class="list-group mb-3"></div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" id="btn-procesar-zonas-modificar">
+                                    <i class="bi bi-gear"></i> Procesar Zonas
+                                </button>
+                                <button type="button" class="btn btn-success" id="btn-aplicar-zonas-modificar">
+                                    <i class="bi bi-check-circle"></i> Aplicar Cambios
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="btn-cancelar-zonas-modificar">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

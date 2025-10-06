@@ -40,13 +40,15 @@ async function crearCaf(caf){
             fecha, 
             mapa
         } = caf
+        const rutaMapa = `/recursos/${mapa}`
+
         const resultado = await pool.query(
             `INSERT INTO caf
                 (fecha, mapa, activa)
             VALUES
                 ($1,$2,true)
-            RETURNING fecha`,
-            [fecha, mapa]
+            RETURNING id, fecha`,
+            [fecha, rutaMapa]
         )
         return resultado
     }catch(error){
@@ -61,6 +63,7 @@ async function modificarCaf(id, caf ={}){
             fecha, 
             mapa
         } = caf
+        const rutaMapa = `/recursos/${mapa}`
         const resultado = await pool.query(
             `UPDATE caf
                 SET
@@ -69,7 +72,7 @@ async function modificarCaf(id, caf ={}){
                     activa=true
                 WHERE id =$3
                 RETURNING fecha`,
-            [fecha, mapa, id]
+            [fecha, rutaMapa, id]
         )
         return resultado
     }catch(error){

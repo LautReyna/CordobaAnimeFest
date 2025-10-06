@@ -28,20 +28,24 @@ async function obtenerEventosCaf(idCaf){
 async function obtenerEventosCafActiva(){
     try{
         const resultado = await pool.query(`
-            SELECT evento.id AS idevento,
-                   evento.nombre,
-                   evento.horainicio,
-                   evento.horafin,
-                   evento.estado,
-                   evento.ubicacion,
-                   evento.descripcion,
-                   evento.imagen,
-                   caf.id AS idcaf,
-                   caf.fecha,
-                   caf.mapa,
-                   caf.activa FROM evento 
-            INNER JOIN eventoCaf ON evento.id = eventoCaf.idEvento 
+            SELECT 
+                evento.id AS id,
+                evento.nombre,
+                evento.horainicio,
+                evento.horafin,
+                evento.estado,
+                zona.id AS idzona,
+                zona.nombre AS nombrezona,
+                evento.descripcion,
+                evento.imagen,
+                caf.id AS idcaf,
+                caf.fecha,
+                caf.mapa,
+                caf.activa
+            FROM evento
+            INNER JOIN eventoCaf ON evento.id = eventoCaf.idEvento
             INNER JOIN caf ON eventoCaf.idCaf = caf.id
+            LEFT JOIN zona ON evento.ubicacion = zona.id 
             WHERE caf.activa = true
         `)
         return resultado
@@ -84,6 +88,8 @@ async function crearEvento(evento){
             descripcion,
             imagen
         } = evento
+        const rutaImagen = `/recursos/${imagen}`
+        
         const resultado = await pool.query(
             `INSERT INTO evento
                 (nombre, horaInicio, horaFin, estado, ubicacion,
@@ -92,7 +98,7 @@ async function crearEvento(evento){
                 ($1,$2,$3,'Pendiente',$4,$5,$6)
             RETURNING nombre, id`,
             [nombre, horaInicio, horaFin, ubicacion,
-                descripcion, imagen]
+                descripcion, rutaImagen]
         )
         return resultado
     }catch(error){
@@ -111,6 +117,8 @@ async function modificarEvento(id, evento ={}){
             descripcion,
             imagen
         } = evento
+        const rutaImagen = `/recursos/${imagen}`
+        
         const resultado = await pool.query(
             `UPDATE evento
                 SET
@@ -124,7 +132,7 @@ async function modificarEvento(id, evento ={}){
                 WHERE id =$7
                 RETURNING nombre`,
             [nombre, horaInicio, horaFin, ubicacion,
-                descripcion, imagen, id]
+                descripcion, rutaImagen, id]
         )
         return resultado
     }catch(error){

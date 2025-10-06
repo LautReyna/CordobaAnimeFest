@@ -38,8 +38,8 @@ app.use('/contacto', routerContacto)
 
 app.use('/recursos', express.static('recursos'))
 app.use('/login',(req, res, next)=>{res.clearCookie('auth'), express.static('login')(req, res, next)})
-app.use('/www', express.static('www'))
 
+// Rutas de admin ANTES de la ruta estática de la raíz
 app.get('/admin/eventos.html', verificarAcceso, verificarRol(['Eventos','Admin']), (req,res)=>{
     res.sendFile(path.join(__dirname, 'admin/eventos.html'))
 })    
@@ -52,6 +52,8 @@ app.get('/admin/usuarios.html', verificarAcceso, verificarRol(['Admin']), (req, 
 
 app.use('/admin', verificarAcceso, express.static(path.join(__dirname, 'admin')))
 
+// Servir www directamente en la raíz (DEBE ir al final)
+app.use('/', express.static('www'))
 
 // create server and io
 const server = http.createServer(app)

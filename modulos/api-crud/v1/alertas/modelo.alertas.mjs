@@ -19,7 +19,20 @@ export async function upsertAlertaUsuario(endpoint, idEvento, modo){
 }
 
 export async function listarAlertasUsuario(endpoint){
-    const r = await pool.query('SELECT id, idEvento, modo, created_at FROM alerta WHERE endpoint=$1 ORDER BY created_at DESC',[endpoint])
+    const r = await pool.query(`
+        SELECT 
+            alerta.id, 
+            alerta.idEvento AS idEvento, 
+            alerta.modo, 
+            alerta.created_at,
+            evento.nombre AS nombreEvento,
+            zona.nombre AS nombreZona
+        FROM alerta 
+        LEFT JOIN evento ON alerta.idEvento = evento.id
+        LEFT JOIN zona ON evento.ubicacion = zona.id
+        WHERE alerta.endpoint=$1 
+        ORDER BY alerta.created_at DESC
+    `, [endpoint])
     return r.rows
 }
 

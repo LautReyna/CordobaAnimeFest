@@ -3,7 +3,8 @@ import {
     carteleraMeet, 
     carteleraEventos, 
     cronogramaEventos, 
-    modalMapa 
+    renderizarMapa,
+    modalMapa
 } from './funciones.js'
 
 // Función para manejar clicks en botones "Programar Alerta"
@@ -15,6 +16,7 @@ function configurarBotonesProgramarAlerta() {
 
         // Determinar idEvento
         let idEvento = btn.dataset.eventId
+        
         if (!idEvento) {
             // Buscar item activo del carousel dentro del mismo modal
             const modal = btn.closest('.modal')
@@ -26,9 +28,17 @@ function configurarBotonesProgramarAlerta() {
             console.warn('No se pudo determinar idEvento para programar alerta')
             return
         }
-
+        
+        // Validar que idEvento sea un número válido
+        const idEventoNumero = parseInt(idEvento)
+        if (isNaN(idEventoNumero)) {
+            console.error('Error: idEvento no es un número válido:', idEvento)
+            return
+        }
+        
+        
         if (window.abrirModalProgramarAlerta) {
-            window.abrirModalProgramarAlerta(Number(idEvento))
+            window.abrirModalProgramarAlerta(idEventoNumero)
         } else {
             console.warn('No se encontró abrirModalProgramarAlerta')
         }
@@ -40,15 +50,16 @@ async function inicializarPagina() {
     try {
         // Obtener datos de la API
         const [datosEventos, datosStands] = await Promise.all([
-            obtenerRegistros('/api/v1/eventos'),
-            obtenerRegistros('/api/v1/stands')
+            obtenerRegistros('/api/v1/eventos/caf/activa'),
+            obtenerRegistros('/api/v1/stands/caf/activa')
         ])
 
         // Renderizar componentes
-carteleraEventos(datosEventos)
-carteleraMeet(datosEventos)
-cronogramaEventos(datosEventos)
-modalMapa(datosEventos, datosStands)
+        carteleraEventos(datosEventos)
+        carteleraMeet(datosEventos)
+        cronogramaEventos(datosEventos)
+        renderizarMapa()
+        modalMapa(datosEventos, datosStands)
 
         // Configurar eventos
         configurarBotonesProgramarAlerta()

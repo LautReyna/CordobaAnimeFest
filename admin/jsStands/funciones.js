@@ -16,7 +16,7 @@ export async function renderizarFormularioPorNombre(datosStands, formulario, men
     
             formulario.nombre.value = stand.nombre
             formulario.descripcion.value = stand.descripcion
-            formulario.ubicacion.value = stand.ubicacion
+            formulario.ubicacion.value = stand.idzona
     
             mostrarMensaje(mensajes, `Se encontro un stand con este nombre: ${formulario.nombre.value}`)
         }else{
@@ -53,7 +53,7 @@ export async function renderizarListadoStands(datosStands, contenedorId) {
                                 <button class="boton">Mostrar más</button>
                             </div>
                         </td>
-                        <td scope="col">${stand.ubicacion}</td>
+                        <td scope="col">${stand.nombrezona}</td>
                     </tr>
                 `
             })

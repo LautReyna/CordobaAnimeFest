@@ -32,15 +32,39 @@ async function obtenerSubscription(){
 
 
 async function crearOActualizarAlerta(idEvento, modo){
-    const sub = await obtenerSubscription()
-    const res = await fetch('/api/v1/alertas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpoint: sub.endpoint, idEvento, modo })
-    })
-    const data = await res.json()
-    if(!res.ok) throw new Error(data?.mensaje || 'Error creando alerta')
-    return data
+    console.log('Iniciando crearOActualizarAlerta con:', { idEvento, modo })
+    
+    try {
+        // Obtener suscripción (esto maneja automáticamente la suscripción si no existe)
+        const sub = await obtenerSubscription()
+        console.log('Subscription obtenida:', sub)
+        
+        const res = await fetch('/api/v1/alertas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: sub.endpoint, idEvento, modo })
+        })
+        
+        console.log('Respuesta del servidor:', res.status)
+        const data = await res.json()
+        console.log('Datos de respuesta:', data)
+        
+        if(!res.ok) throw new Error(data?.mensaje || 'Error creando alerta')
+        
+        // Mensaje mejorado que indica que la suscripción se activó automáticamente
+        const mensajeMejorado = data.mensaje || 'Alerta creada correctamente'
+        return { ...data, mensaje: mensajeMejorado }
+        
+    } catch (error) {
+        console.error('Error en crearOActualizarAlerta:', error)
+        
+        // Si el error es por permisos de notificaciones, dar mensaje más claro
+        if (error.message.includes('No SW support') || error.message.includes('permission')) {
+            throw new Error('Para recibir notificaciones, necesitas permitir las notificaciones en tu navegador. Por favor, habilita las notificaciones y vuelve a intentar.')
+        }
+        
+        throw error
+    }
 }
 
 async function listarAlertas(){
@@ -69,11 +93,17 @@ export function renderizarAlertas(datosAlertas) {
     if (!contenedorAlertas) return
     
     if (!datosAlertas || datosAlertas.length === 0) {
-        contenedorAlertas.innerHTML = '<p class="text-center">No tienes alertas programadas</p>'
+        contenedorAlertas.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-bell-slash text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-muted">No tienes alertas programadas</h5>
+                <p class="text-muted">¡Programa alertas para tus eventos favoritos!</p>
+            </div>
+        `
         return
     }
     
-    let html = '<div class="row">'
+    let html = '<div class="row g-4">'
     datosAlertas.forEach(alerta => {
         const modoTexto = {
             'todos': 'Todos los cambios',
@@ -81,17 +111,73 @@ export function renderizarAlertas(datosAlertas) {
             'en_curso': 'En curso'
         }[alerta.modo] || alerta.modo
         
+        const modoIcono = {
+            'todos': 'bi-bell-fill',
+            'por_iniciar': 'bi-clock',
+            'en_curso': 'bi-play-circle'
+        }[alerta.modo] || 'bi-bell'
+        
+        const modoColor = {
+            'todos': 'primary',
+            'por_iniciar': 'warning',
+            'en_curso': 'success'
+        }[alerta.modo] || 'secondary'
+        
+        console.log(alerta.nombreEvento)
         html += `
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Evento #${alerta.idEvento}</h5>
-                        <p class="card-text">Modo: ${modoTexto}</p>
-                        <small class="text-muted">Creada: ${new Date(alerta.created_at).toLocaleDateString()}</small>
+            <div class="col-md-6 col-lg-4"> 
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header bg-${modoColor} text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold">
+                                <i class="bi ${modoIcono} me-2"></i>
+                                ${alerta.nombreevento || `Evento #${alerta.idevento}`}
+                            </h6>
+                            <span class="badge bg-light text-dark">${modoTexto}</span>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-outline-primary me-2" onclick="editarAlerta(${alerta.id})">Editar</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarAlerta(${alerta.id})">Eliminar</button>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-primary mb-2">
+                                <i class="bi bi-gear me-1"></i>
+                                Configuración
+                            </h6>
+                            <p class="mb-0 text-muted">Modo: <span class="fw-semibold">${modoTexto}</span></p>
+                        </div>
+                        ${alerta.nombreZona ? `
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-primary mb-2">
+                                <i class="bi bi-geo-alt me-1"></i>
+                                Ubicación
+                            </h6>
+                            <p class="mb-0 text-muted">${alerta.nombreZona}</p>
+                        </div>
+                        ` : ''}
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-primary mb-2">
+                                <i class="bi bi-calendar me-1"></i>
+                                Fecha de Creación
+                            </h6>
+                            <p class="mb-0 text-muted">${new Date(alerta.created_at).toLocaleDateString('es-ES', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm flex-fill" onclick="editarAlerta(${alerta.id})">
+                                <i class="bi bi-pencil me-1"></i>
+                                Editar
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm flex-fill" onclick="eliminarAlerta(${alerta.id})">
+                                <i class="bi bi-trash me-1"></i>
+                                Eliminar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

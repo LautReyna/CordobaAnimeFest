@@ -1,6 +1,6 @@
 import { renderizarListadoEventos } from './funciones.js'
 import { obtenerRegistros } from '../recursos/utilidades.js'
-import { verificarCafActiva, cambiarComboBox, cargarComboBox, mostrarEventosSegunCaf } from '../jsAdmin/funciones.js'
+import { verificarCafActiva, cambiarComboBox, cargarComboBox, mostrarEventosSegunCaf, cargarComboBoxZonas } from '../jsAdmin/funciones.js'
 
 await verificarCafActiva()
 
@@ -11,6 +11,7 @@ const cafActiva = await resCaf.json()
 
 cargarComboBox(datosCaf, cafActiva)
 cambiarComboBox(datosCaf, mostrarEventosSegunCaf)
+cargarComboBoxZonas('cb-ubicacion')
 
 async function cargandoEventos(){
     const respuesta = await obtenerRegistros('/api/v1/eventos/caf/activa')

@@ -7,13 +7,20 @@ CREATE TABLE caf(
     activa BOOLEAN
 );
 
+CREATE TABLE zona(
+    id SERIAL PRIMARY KEY,
+    idCaf INT REFERENCES caf(id) ON DELETE CASCADE,
+    nombre VARCHAR(50),
+    coordenadas TEXT
+);
+
 CREATE TABLE evento(
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50),
     horaInicio TIME,
     horaFin TIME,
     estado VARCHAR(20),
-    ubicacion VARCHAR(20),
+    ubicacion INT REFERENCES zona(id),
     descripcion TEXT,
     imagen VARCHAR(250)
 );
@@ -28,8 +35,7 @@ CREATE TABLE stand(
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50),
     descripcion TEXT,
-    ubicacion VARCHAR(20),
-    estado VARCHAR(20)
+    ubicacion INT REFERENCES zona(id)
 );
 
 CREATE TABLE standCaf(
@@ -54,7 +60,7 @@ CREATE TABLE alerta(
 );
 
 CREATE TABLE auditoria(
-    idUsuario INT REFERENCES usuario(id),
+    idUsuario INT REFERENCES usuario(id) ON DELETE CASCADE,
     fechaHora TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     ipTerminal VARCHAR(30)
 );

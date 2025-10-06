@@ -50,10 +50,14 @@ async function crearEvento(req, res) {
             horaInicio, 
             horaFin, 
             ubicacion, 
-            descripcion,
-            imagen
+            descripcion
         } = req.body
-        if (!nombre || !horaInicio || !horaFin || !ubicacion || !descripcion || !imagen) {
+
+        const fileName = req.file? req.file.filename : null
+        
+        console.log('Archivo recibido:', fileName)
+        
+        if (!nombre || !horaInicio || !horaFin || !ubicacion || !descripcion || !fileName) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
 
@@ -71,7 +75,7 @@ async function crearEvento(req, res) {
             horaFin,
             ubicacion, 
             descripcion,
-            imagen
+            imagen: fileName
         })
         const eventoCreado = resultado.rows[0]
         await modelo.vincularEventoCaf(eventoCreado.id, idCaf)
@@ -90,19 +94,40 @@ async function modificarEvento(req, res) {
             horaInicio, 
             horaFin,
             ubicacion, 
-            descripcion,
-            imagen
+            descripcion
         } = req.body
-        if (!nombre || !horaInicio || !horaFin || !ubicacion || !descripcion || !imagen) {
+
+        const fileName = req.file? req.file.filename : null
+        
+        console.log('Archivo recibido para modificación:', fileName)
+        
+        if (!nombre || !horaInicio || !horaFin || !ubicacion || !descripcion) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
+
+        // Si no hay archivo nuevo, mantener el existente
+        let imagenPath = null
+        if (fileName) {
+            imagenPath = fileName
+        } else {
+            // Obtener la imagen actual del evento
+            const eventoActual = await modelo.obtenerEvento(id)
+            if (eventoActual.rows.length > 0) {
+                imagenPath = eventoActual.rows[0].imagen
+            }
+        }
+
+        if (!imagenPath) {
+            return res.status(400).json({ mensaje: 'Imagen requerida' })
+        }
+
         const resultado = await modelo.modificarEvento(id, {
             nombre, 
             horaInicio, 
             horaFin,
             ubicacion, 
             descripcion,
-            imagen
+            imagen: imagenPath
         })
         const { nombre: nombreModificado } = resultado.rows[0]
         res.json({ mensaje: `Evento ${nombreModificado} modificado` })

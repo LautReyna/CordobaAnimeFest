@@ -31,14 +31,15 @@ async function obtenerStandsCafActiva(){
             SELECT stand.id AS idstand,
                    stand.nombre,
                    stand.descripcion,
-                   stand.ubicacion,
-                   stand.estado,
+                   zona.id AS idzona,
+                   zona.nombre AS nombrezona,
                    caf.id AS idcaf,
-                   caf.fecha,
+                   caf.fecha,   
                    caf.mapa,
                    caf.activa FROM stand 
             INNER JOIN standCaf ON stand.id = standCaf.idStand 
             INNER JOIN caf ON standCaf.idCaf = caf.id
+            LEFT JOIN zona ON stand.ubicacion = zona.id
             WHERE caf.activa = true
         `)
         return resultado
