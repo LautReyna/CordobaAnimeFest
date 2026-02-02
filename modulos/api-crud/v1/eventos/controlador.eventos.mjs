@@ -1,6 +1,8 @@
+// Importa el modelo de eventos y el pool de conexión a la base de datos
 import * as modelo from './modelo.eventos.mjs'
 import pool from '../../../../conexion/conexion.bd.mjs'
 
+// Obtiene todos los eventos de una CAF específica
 async function obtenerEventosCaf(req, res){
     try {
         const { idCaf } = req.params
@@ -12,6 +14,7 @@ async function obtenerEventosCaf(req, res){
     }
 }
 
+// Obtiene todos los eventos de la CAF activa
 async function obtenerEventosCafActiva(req, res){
     try{
         const resultado = await modelo.obtenerEventosCafActiva()
@@ -22,6 +25,7 @@ async function obtenerEventosCafActiva(req, res){
     }
 }
 
+// Obtiene todos los eventos registrados
 async function obtenerEventos(req, res) {
     try {
         const resultado = await modelo.obtenerEventos()
@@ -32,6 +36,7 @@ async function obtenerEventos(req, res) {
     }
 }
 
+// Obtiene un evento específico por su ID
 async function obtenerEvento(req, res) {
     try {
         const { id } = req.params
@@ -43,6 +48,7 @@ async function obtenerEvento(req, res) {
     }
 }
 
+// Crea un nuevo evento y lo vincula a la CAF activa
 async function crearEvento(req, res) {
     try {
         const {
@@ -53,14 +59,17 @@ async function crearEvento(req, res) {
             descripcion
         } = req.body
 
+        // Obtiene el nombre del archivo de imagen si fue subido
         const fileName = req.file? req.file.filename : null
         
         console.log('Archivo recibido:', fileName)
+        
         
         if (!nombre || !horaInicio || !horaFin || !ubicacion || !descripcion || !fileName) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
 
+        // Busca la CAF activa para asociar el evento
         const resultadoCaf = await pool.query('SELECT id FROM caf WHERE activa = true')
 
         if(resultadoCaf.rows.length === 0){
@@ -69,6 +78,7 @@ async function crearEvento(req, res) {
 
         const idCaf = resultadoCaf.rows[0].id
 
+        
         const resultado = await modelo.crearEvento({
             nombre, 
             horaInicio, 
@@ -78,6 +88,7 @@ async function crearEvento(req, res) {
             imagen: fileName
         })
         const eventoCreado = resultado.rows[0]
+        // Vincula el evento creado a la CAF activa
         await modelo.vincularEventoCaf(eventoCreado.id, idCaf)
         res.json({ mensaje: `Evento ${eventoCreado.nombre} dado de alta` })
     } catch (error) {
@@ -86,6 +97,7 @@ async function crearEvento(req, res) {
     }
 }
 
+// Modifica un evento existente
 async function modificarEvento(req, res) {
     try {
         const { id } = req.params
@@ -97,6 +109,7 @@ async function modificarEvento(req, res) {
             descripcion
         } = req.body
 
+        // Obtiene el nombre del archivo de imagen si fue subido
         const fileName = req.file? req.file.filename : null
         
         console.log('Archivo recibido para modificación:', fileName)
@@ -110,17 +123,19 @@ async function modificarEvento(req, res) {
         if (fileName) {
             imagenPath = fileName
         } else {
-            // Obtener la imagen actual del evento
+            // Obtiene la imagen actual del evento desde la base de datos
             const eventoActual = await modelo.obtenerEvento(id)
             if (eventoActual.rows.length > 0) {
                 imagenPath = eventoActual.rows[0].imagen
             }
         }
 
+        // Si no hay imagen, retorna error
         if (!imagenPath) {
             return res.status(400).json({ mensaje: 'Imagen requerida' })
         }
 
+        
         const resultado = await modelo.modificarEvento(id, {
             nombre, 
             horaInicio, 
@@ -137,9 +152,11 @@ async function modificarEvento(req, res) {
     }
 }
 
+// Elimina un evento específico por su ID
 async function eliminarEvento(req, res) {
     try {
         const { id } = req.params
+        
         const resultado = await modelo.eliminarEvento(id)
         if (resultado.rows.length > 0) {
             const { nombre: nombreEliminado } = resultado.rows[0]
@@ -153,9 +170,11 @@ async function eliminarEvento(req, res) {
     }
 }
 
+// Cancela un evento específico por su ID
 async function cancelarEvento(req, res){
     try{
         const { id } = req.params
+        
         const resultado = await modelo.cancelarEvento(id)
         if(resultado.rows.length > 0){
             const { nombre: nombreCancelado } = resultado.rows[0]
@@ -169,4 +188,5 @@ async function cancelarEvento(req, res){
     }
 }
 
+// Exporta todas las funciones del controlador
 export { obtenerEventosCaf, obtenerEventosCafActiva, obtenerEventos, obtenerEvento, crearEvento, modificarEvento, eliminarEvento, cancelarEvento }

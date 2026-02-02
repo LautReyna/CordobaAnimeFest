@@ -22,7 +22,7 @@ function validarFormulario(datos) {
         errores.push('La contraseña no puede tener más de 50 caracteres')
     }
 
-    // Validar caracteres especiales peligrosos
+    // Validar caracteres especiales peligrosos (protección XSS)
     const caracteresPeligrosos = /[<>'"&]/
     if (caracteresPeligrosos.test(datos.nombre) || caracteresPeligrosos.test(datos.contrasena)) {
         errores.push('No se permiten caracteres especiales peligrosos')

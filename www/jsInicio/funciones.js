@@ -1,4 +1,17 @@
-// Función para obtener registros de la API
+// Función helper para determinar si el texto necesita botón de expansión
+function necesitaBotonExpansion(texto, limiteCaracteres = 100) {
+    return texto && texto.length > limiteCaracteres
+}
+
+// Función helper para truncar texto si es necesario
+function truncarTexto(texto, limiteCaracteres = 100) {
+    if (!texto || texto.length <= limiteCaracteres) {
+        return texto
+    }
+    return texto.substring(0, limiteCaracteres) + '...'
+}
+
+// Función para obtener registros
 export async function obtenerRegistros(ruta) {
     try {
         const respuesta = await fetch(ruta)
@@ -9,22 +22,26 @@ export async function obtenerRegistros(ruta) {
     }
 }
 
-// Función para renderizar cartelera de Meet N Greet
+// Función para renderizar la cartelera de eventos Meet N Greet
 export function carteleraMeet(datosEventos) {
     try {
+        // Obtiene el contenedor del DOM
         const contenedorMeet = document.getElementById('contenedor-meet')
+        // Si no existe, termina la función
         if (!contenedorMeet) return
+        
+        let columnas = '' // Acumula las columnas de eventos
+        let filas = ''    // Acumula las filas (grupos de columnas)
+        let count = 0     // Contador para agrupar de a 4 columnas
 
-        let columnas = ''
-        let filas = ''
-        let count = 0
-
+        // Filtra los eventos que sean Meet N Greet por nombre o zona
         const eventosMeet = datosEventos.filter(e => {
             const primeraPalabra = e.nombre?.split(' ')[0].toLowerCase()
             const ubicacion = e.nombrezona?.toLowerCase()
             return primeraPalabra === 'meet' || ubicacion === 'meet'
         })
 
+        // Por cada evento Meet, genera el HTML de la columna y modal
         eventosMeet.forEach((evento) => {
             columnas += `
                 <div class="col-6 col-md-4 col-lg-3 mb-4">
@@ -104,41 +121,44 @@ export function carteleraMeet(datosEventos) {
             `
             count++
 
+            // Cada 4 columnas, crea una fila y reinicia columnas
             if (count % 4 === 0) {
                 filas += `<div class="row g-0">${columnas}</div>`
                 columnas = ''
             }
         })
 
+        // Si quedan columnas sueltas, las agrega como una fila final
         if (columnas.length > 0) {
             filas += `<div class="row g-0">${columnas}</div>`
         }
 
-        contenedorMeet.innerHTML = filas
+        contenedorMeet.innerHTML = filas // Inserta el HTML generado en el contenedor
     } catch (error) {
         console.log(error)
     }
 }
 
-// Función para renderizar cartelera de eventos
+// Función para renderizar la cartelera de eventos generales (no Meet N Greet)
 export function carteleraEventos(datosEventos) {
     try {
+        // Contenedor de eventos
         const contenedorEventos = document.getElementById('contenedor-eventos')
         if (!contenedorEventos) return
 
-        let columnas = ''
-        let filas = ''
-        let cont = 0
-        const grupos = {}
+        let columnas = '' // Acumula columnas de eventos
+        let filas = ''    // Acumula filas (grupos de columnas)
+        let cont = 0      // Contador para agrupar de a 4 columnas
+        const grupos = {} // Objeto para agrupar eventos por imagen
 
-        // Filtrar eventos que NO sean de Meet & Greet
+        // Filtra los eventos que NO sean Meet N Greet
         const eventosNoMeet = datosEventos.filter(e => {
             const primeraPalabra = e.nombre?.split(' ')[0].toLowerCase()
             const ubicacion = e.nombrezona?.toLowerCase()
             return primeraPalabra !== 'meet' && ubicacion !== 'meet'
         })
 
-        // Agrupar eventos por imagen
+        // Agrupa los eventos por imagen
         eventosNoMeet.forEach((evento) => {
             if (!grupos[evento.imagen]) {
                 grupos[evento.imagen] = []
@@ -146,33 +166,36 @@ export function carteleraEventos(datosEventos) {
             grupos[evento.imagen].push(evento)
         })
 
+        // Por cada grupo de imagen, genera el modal correspondiente
         for (const [imagen, eventos] of Object.entries(grupos)) {
             cont++
             if (eventos.length === 1) {
                 let evento = eventos[0]
-                columnas += crearModalEventoSimple(evento)
+                columnas += crearModalEventoSimple(evento) // Modal simple si solo hay un evento
             } else {
-                columnas += crearModalEventoCarousel(imagen, eventos)
+                columnas += crearModalEventoCarousel(imagen, eventos) // Modal con carousel si hay varios
             }
             
+            // Cada 4 columnas, crea una fila y reinicia columnas
             if (cont % 4 === 0) {
                 filas += `<div class="row g-0">${columnas}</div>`
                 columnas = ''
             }
         }
         
+        // Si quedan columnas sueltas, las agrega como una fila final
         if (columnas.length > 0) {
             filas += `<div class="row g-0">${columnas}</div>`
         }
 
-        contenedorEventos.innerHTML = filas
-        configurarCarouseles()
+        contenedorEventos.innerHTML = filas // Inserta el HTML generado en el contenedor
+        configurarCarouseles() // Configura los eventos de los carouseles
     } catch (error) {
         console.log(error)
     }
 }
 
-// Función auxiliar para crear modal de evento simple
+// Función auxiliar para crear el modal de un evento simple (sin carousel)
 function crearModalEventoSimple(evento) {
     return `
         <div class="col-6 col-md-4 col-lg-3 mb-4">
@@ -259,10 +282,11 @@ function crearModalEventoSimple(evento) {
     `
 }
 
-// Función auxiliar para crear modal de evento con carousel
+// Función auxiliar para crear el modal de un grupo de eventos con carousel
 function crearModalEventoCarousel(imagen, eventos) {
     let carouselItems = ''
     
+    // Genera los items del carousel para cada evento
     eventos.forEach((evento, index) => {
         carouselItems += `
             <div class="carousel-item ${index === 0 ? 'active' : ''}" data-event-name="${evento.nombre}" data-event-id="${evento.id}">
@@ -318,16 +342,17 @@ function crearModalEventoCarousel(imagen, eventos) {
         `
     })
 
-    // Validar que el primer evento tenga ID
+    // Validación: el primer evento debe tener ID
     if (!eventos[0]?.id) {
         console.error('Error: El primer evento no tiene ID válido')
         return ''
     }
 
-    // Crear un ID único basado en el hash de la imagen
+    // Crea un ID único para el modal basado en la imagen y el ID del primer evento
     const imagenHash = imagen.split('/').pop().replace(/[^a-zA-Z0-9]/g, '') || 'imagen'
     const modalId = `carousel-modal-${imagenHash}-${eventos[0].id}`
 
+    // Devuelve el HTML del grupo de eventos con carousel
     return `
         <div class="col-6 col-md-4 col-lg-3 mb-4">
             <div class="zoom-img">
@@ -382,21 +407,23 @@ function crearModalEventoCarousel(imagen, eventos) {
     `
 }
 
-// Función para configurar eventos de carousel
+// Función para configurar los eventos de los carouseles de los modales
 function configurarCarouseles() {
     document.querySelectorAll('.carousel').forEach((carousel) => {
         carousel.addEventListener('slid.bs.carousel', (event) => {
-            const active = event.relatedTarget
-            const nombre = active.dataset.eventName
-            const eventId = active.dataset.eventId
-            const modal = event.target.closest('.modal')
-            const title = modal.querySelector('.modal-header h5')
-            const btnProgramarAlerta = modal.querySelector('.btn-programar-alerta')
+            const active = event.relatedTarget // Elemento activo del carousel
+            const nombre = active.dataset.eventName // Nombre del evento activo
+            const eventId = active.dataset.eventId // ID del evento activo
+            const modal = event.target.closest('.modal') // Modal que contiene el carousel
+            const title = modal.querySelector('.modal-header h5') // Título del modal
+            const btnProgramarAlerta = modal.querySelector('.btn-programar-alerta') // Botón de alerta
             
+            // Actualiza el título del modal con el nombre del evento activo
             if (title) {
                 title.textContent = nombre
             }
             
+            // Actualiza el data-event-id del botón de alerta
             if (btnProgramarAlerta && eventId) {
                 btnProgramarAlerta.dataset.eventId = eventId
                 console.log('Actualizado data-event-id del botón:', eventId)
@@ -405,63 +432,105 @@ function configurarCarouseles() {
     })
 }
 
-// Función para renderizar cronograma de eventos
+// Función para renderizar el cronograma de eventos en una tabla
 export function cronogramaEventos(datosEventos) {
     try {
-        const contenedorEventos = document.getElementById('cronograma-eventos')
+        const contenedorEventos = document.getElementById('cronograma-eventos') // Contenedor de la tabla
         if (!contenedorEventos) return
 
-        // Ordenar eventos por hora de inicio
+        // Ordena los eventos por hora de inicio
         const eventosOrdenados = [...datosEventos].sort((a, b) => a.horainicio.localeCompare(b.horainicio))
 
         let filas = ''
         
+        // Genera las filas de la tabla para cada evento
         eventosOrdenados.forEach((evento) => {
+            const necesitaBoton = necesitaBotonExpansion(evento.descripcion)
+            const textoMostrar = necesitaBoton ? truncarTexto(evento.descripcion) : evento.descripcion
+            
             filas += `
                 <tr>
                     <td scope="col">${evento.horainicio?.substring(0,5)} - ${evento.horafin?.substring(0,5)}</td>
                     <td scope="col">${evento.nombre}</td>
                     <td scope="col">${evento.nombrezona}</td>
                     <td scope="col">
-                        <div class="descripcion">
-                            <p>${evento.descripcion}</p>
-                            <button class="boton">...</button>
+                        <div class="descripcion ${necesitaBoton ? '' : 'sin-boton'}">
+                            <p class="descripcion-texto">${textoMostrar}</p>
+                            ${necesitaBoton ? `
+                                <button class="btn-expandir" type="button" aria-expanded="false" data-texto-completo="${evento.descripcion}">
+                                    <span class="btn-texto">Mostrar más</span>
+                                    <span class="btn-icono">▼</span>
+                                </button>
+                            ` : ''}
                         </div>
                     </td>
                 </tr>
             `
         })
         
-        contenedorEventos.innerHTML = filas
-        configurarBotonesDescripcion()
+        contenedorEventos.innerHTML = filas // Inserta las filas en el contenedor
+        configurarBotonesDescripcion() // Configura los botones para expandir/cerrar descripción
     } catch (error) {
         console.log(error)
     }
 }
 
-// Función para configurar botones de descripción expandible
+// Función para configurar los botones que expanden/cierran la descripción de los eventos
 function configurarBotonesDescripcion() {
-    document.querySelectorAll('.boton').forEach((boton) => {
+    document.querySelectorAll('.btn-expandir').forEach((boton) => {
         boton.addEventListener('click', (e) => {
+            e.preventDefault()
             const contenedor = e.target.closest('.descripcion')
+            const texto = contenedor.querySelector('.btn-texto')
+            const icono = contenedor.querySelector('.btn-icono')
+            const descripcionTexto = contenedor.querySelector('.descripcion-texto')
+            
+            // Obtener el texto completo del atributo data-texto-completo
+            const textoCompleto = boton.getAttribute('data-texto-completo')
+            
+            // Alternar estado expandido
+            const estaExpandido = contenedor.classList.contains('expandida')
             contenedor.classList.toggle('expandida')
-            e.target.textContent = contenedor.classList.contains('expandida') ? 'Mostrar menos' : '...'
+            
+            // Actualizar contenido del texto según el estado
+            if (estaExpandido) {
+                // Contraer: mostrar texto truncado
+                descripcionTexto.textContent = truncarTexto(textoCompleto)
+                texto.textContent = 'Mostrar más'
+                icono.textContent = '▼'
+                boton.setAttribute('aria-expanded', 'false')
+            } else {
+                // Expandir: mostrar texto completo
+                descripcionTexto.textContent = textoCompleto
+                texto.textContent = 'Mostrar menos'
+                icono.textContent = '▲'
+                boton.setAttribute('aria-expanded', 'true')
+            }
+            
+            // Scroll suave hacia el botón si está expandiendo
+            if (!estaExpandido) {
+                setTimeout(() => {
+                    boton.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                }, 100)
+            }
         })
     })
 }
 
-// funcion para renderizar mapa
+// Función para renderizar el mapa interactivo de la CAF y zonas
 export async function renderizarMapa() {
-    const mapa = document.getElementById('contenedor-mapa')
+    const mapa = document.getElementById('contenedor-mapa') // Contenedor del mapa
 
     console.log('Iniciando renderizado del mapa...')
     
+    // Obtiene la CAF activa y las zonas asociadas desde la API
     const cafActiva = await obtenerRegistros('/api/v1/caf/activa')
     const zonas = await obtenerRegistros(`/api/v1/zonas/caf/${cafActiva.id}`)
 
     console.log('Zonas cargadas:', zonas);
     if (!mapa) return
     
+    // Crea una imagen para obtener dimensiones reales
     const img = new Image()
     img.src = cafActiva.mapa
     img.alt = 'Mapa de la CAF'
@@ -472,6 +541,7 @@ export async function renderizarMapa() {
         console.log('Dimensiones de la imagen:', { width, height });
         console.log('Zonas cargadas:', zonas);
 
+        // Inserta el HTML del mapa y el SVG con las zonas
         mapa.innerHTML = `
             <div class="mapa-svg-container">
                 <img src="${cafActiva.mapa}" alt="Mapa de la CAF">
@@ -496,37 +566,37 @@ export async function renderizarMapa() {
             </div>
         `
         
-        // Configurar eventos de click después de crear los elementos SVG
+        // Configura los eventos de click en las zonas del mapa
         configurarEventosMapa()
     }
 
 }
 
-// Variables globales para datos de eventos y stands
+// Variables globales para almacenar los datos de eventos y stands para el mapa
 let datosEventosGlobales = []
 let datosStandsGlobales = []
 
-// Función para configurar modal del mapa
+// Función para guardar los datos de eventos y stands globalmente (para el mapa)
 export function modalMapa(datosEventos, datosStands) {
-    // Guardar datos globalmente para usar en configurarEventosMapa
+    // Guarda los datos globales para usar en configurarEventosMapa
     datosEventosGlobales = datosEventos
     datosStandsGlobales = datosStands
 }
 
-// Función para configurar eventos de click en el mapa
+// Función para configurar los eventos de click en las zonas del mapa SVG
 function configurarEventosMapa() {
     const selectorAreas = '.area-svg[data-espacio]'
     document.querySelectorAll(selectorAreas).forEach((area) => {
         area.addEventListener('click', (e) => {
             e.preventDefault()
-            const lugar = area.dataset.espacio
-            const zonaId = area.dataset.zonaId
+            const lugar = area.dataset.espacio // Nombre de la zona
+            const zonaId = area.dataset.zonaId // ID de la zona
             
             console.log('Click en zona:', lugar, 'ID:', zonaId)
             console.log('Datos eventos:', datosEventosGlobales)
             console.log('Datos stands:', datosStandsGlobales)
             
-            // Filtrado por nombre de zona (ahora que viene directamente de la DB)
+            // Filtra los eventos y stands que correspondan a la zona seleccionada
             const eventosFiltrados = datosEventosGlobales.filter(evento => 
                 evento.nombrezona && evento.nombrezona.trim().toLowerCase() === lugar.trim().toLowerCase()
             )
@@ -534,14 +604,13 @@ function configurarEventosMapa() {
                 stand.nombrezona && stand.nombrezona.trim().toLowerCase() === lugar.trim().toLowerCase()
             )
             
-            console.log('Eventos encontrados:', eventosFiltrados)
-            console.log('Stands encontrados:', standsFiltrados)
-            
+            // Muestra el modal con los eventos y stands filtrados
             mostrarModal(lugar, eventosFiltrados, standsFiltrados)
         })
     })
 }
 
+// Función para mostrar el modal con los eventos y stands de una zona
 function mostrarModal(lugar, eventos, stands) {
     const modal = document.querySelector('#modal-eventos')
     if (!modal) {
@@ -552,12 +621,12 @@ function mostrarModal(lugar, eventos, stands) {
     const modalTitle = modal.querySelector('.modal-title')
     const modalBody = modal.querySelector('.modal-body')
 
-    modalTitle.textContent = lugar
+    modalTitle.textContent = lugar // Título del modal con el nombre de la zona
     modalBody.innerHTML = ''
     
     let contenido = ''
     
-    // Agregar eventos si existen
+    // Si hay eventos, los agrega como acordeón
     if (eventos.length > 0) {
         contenido += `
             <div class="mb-4">
@@ -589,7 +658,7 @@ function mostrarModal(lugar, eventos, stands) {
         contenido += '</div></div>'
     }
     
-    // Agregar stands si existen
+    // Si hay stands, los agrega como acordeón
     if (stands.length > 0) {
         contenido += `
             <div class="mb-4">
@@ -617,11 +686,11 @@ function mostrarModal(lugar, eventos, stands) {
         contenido += '</div></div>'
     }
     
-    // Si no hay eventos ni stands
+    // Si no hay eventos ni stands, muestra un mensaje
     if (eventos.length === 0 && stands.length === 0) {
         contenido = '<p class="text-muted">No se encuentran eventos ni stands para este lugar</p>'
     }
     
-    modalBody.innerHTML = contenido
-    new bootstrap.Modal(modal).show()
+    modalBody.innerHTML = contenido // Inserta el contenido en el modal
+    new bootstrap.Modal(modal).show() // Muestra el modal
 }

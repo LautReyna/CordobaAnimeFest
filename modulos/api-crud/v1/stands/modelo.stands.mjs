@@ -1,5 +1,7 @@
+// Importa el pool de conexión a la base de datos
 import pool from '../../../../conexion/conexion.bd.mjs'
 
+// Vincula un stand a una edición de CAF específica.
 async function vincularStandCaf(idStand, idCaf){
     try{
         await pool.query(
@@ -12,6 +14,7 @@ async function vincularStandCaf(idStand, idCaf){
     }
 }
 
+// Obtiene todos los stands asociados a una edición de CAF específica.
 async function obtenerStandsCaf(idCaf){
     try{
         const resultado = await pool.query(
@@ -25,6 +28,7 @@ async function obtenerStandsCaf(idCaf){
     }
 }
 
+// Obtiene todos los stands asociados a la CAF activa, incluyendo información de zona y caf.
 async function obtenerStandsCafActiva(){
     try{
         const resultado = await pool.query(`
@@ -49,6 +53,7 @@ async function obtenerStandsCafActiva(){
     }
 }
 
+// Obtiene todos los stands registrados en la base de datos.
 async function obtenerStands(){
     try{
         const resultado = await pool.query('SELECT * FROM stand')
@@ -59,6 +64,7 @@ async function obtenerStands(){
     }
 }
 
+// Obtiene un stand específico por su ID.
 async function obtenerStand(id){
     try{
         const resultado = await pool.query(
@@ -72,6 +78,7 @@ async function obtenerStand(id){
     }
 }
 
+// Crea un nuevo stand en la base de datos.
 async function crearStand(stand){
     try{
         const {
@@ -94,6 +101,7 @@ async function crearStand(stand){
     }
 }
 
+// Modifica un stand existente en la base de datos.
 async function modificarStand(id, stand ={}){
     try{
         const {
@@ -118,6 +126,7 @@ async function modificarStand(id, stand ={}){
     }
 }
 
+// Elimina un stand específico por su ID.
 async function eliminarStand(id){
     try{
         const resultado = await pool.query(
@@ -133,6 +142,7 @@ async function eliminarStand(id){
     }
 }
 
+// Exporta todas las funciones del modelo
 export{
     vincularStandCaf,
     obtenerStandsCaf,

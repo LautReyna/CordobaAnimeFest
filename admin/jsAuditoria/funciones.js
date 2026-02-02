@@ -1,8 +1,10 @@
+// Función para renderizar el listado de auditoria
 export function renderizarListadoAuditoria(datosAuditoria) {
     try {
         const contenedorAudtitoria = document.getElementById('contenedor-auditoria')
         let filas = ''
 
+        // Si no hay datos de auditoria, mostrar mensaje
         if(!datosAuditoria || datosAuditoria.length === 0){
             filas = `
                     <tr>
@@ -10,6 +12,7 @@ export function renderizarListadoAuditoria(datosAuditoria) {
                     </tr>
                 `
         }else{
+            // Si hay datos de auditoria, mostrarlos
             datosAuditoria.forEach((auditoria) => {
                 filas += `
                     <tr>

@@ -1,33 +1,34 @@
+/* Archivo principal de estilos CSS para la aplicación CAF. */
 
-/* ===== ESTILOS MODERNOS PARA CAF ===== */
-
-/* Variables CSS */
+/* VARIABLES CSS */
+/* Definición de variables para colores, sombras, bordes y transiciones */
 :root {
-  --primary-color: #0d6efd;
-  --secondary-color: #6c757d;
-  --success-color: #198754;
-  --danger-color: #dc3545;
-  --warning-color: #ffc107;
-  --info-color: #0dcaf0;
-  --light-color: #f8f9fa;
-  --dark-color: #212529;
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-  --border-radius: 0.5rem;
-  --transition: all 0.3s ease;
+  --primary-color: #0d6efd;           /* Color primario (azul) */
+  --secondary-color: #6c757d;         /* Color secundario (gris) */
+  --success-color: #198754;           /* Color para éxito (verde) */
+  --danger-color: #dc3545;            /* Color para error/peligro (rojo) */
+  --warning-color: #ffc107;           /* Color para advertencia (amarillo) */
+  --info-color: #0dcaf0;              /* Color informativo (celeste) */
+  --light-color: #f8f9fa;             /* Color claro */
+  --dark-color: #212529;              /* Color oscuro */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);    /* Gradiente principal */
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);  /* Gradiente secundario */
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);   /* Sombra pequeña */
+  --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);            /* Sombra normal */
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);          /* Sombra grande */
+  --border-radius: 0.5rem;                                /* Radio de borde general */
+  --transition: all 0.3s ease;                            /* Transición suave */
 }
 
-/* Estilos globales */
+/* ESTILOS GLOBALES */
+/* Fuente principal y color de texto */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: var(--dark-color);
 }
 
-/* Gradientes personalizados */
+/* GRADIENTES PERSONALIZADOS */
 .bg-gradient-primary {
   background: var(--gradient-primary);
 }
@@ -36,28 +37,122 @@ body {
   background: var(--gradient-secondary);
 }
 
-/* Hero Section */
+/* ESTILOS PARA BOTONES DE EXPANSIÓN */
+/* Estilos para las descripciones que se pueden expandir/contraer */
+.descripcion {
+    max-height: 60px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 35px;
+    transition: max-height 0.4s ease-in-out;
+    border-radius: 4px;
+}
+
+/* Estado expandido de la descripción */
+.descripcion.expandida {
+    max-height: none;
+    padding-bottom: 10px;
+}
+
+/* Texto de la descripción */
+.descripcion-texto {
+    margin: 0;
+    padding: 8px 0;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* Botón para expandir/contraer descripción */
+.btn-expandir {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(135deg, #444 0%, #888 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 100px;
+    justify-content: center;
+}
+
+/* Efectos hover y focus para el botón */
+.btn-expandir:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    background: linear-gradient(135deg, #222 0%, #666 100%);
+}
+
+.btn-expandir:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.btn-expandir:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Estilos para el texto del botón */
+.btn-texto {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Estilos para el icono del botón */
+.btn-icono {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+    font-weight: bold;
+}
+
+/* Animación del icono cuando se expande */
+.descripcion.expandida .btn-icono {
+    transform: rotate(180deg);
+}
+
+/* Estilos para descripciones que no necesitan botón */
+.descripcion.sin-boton {
+    max-height: none;
+    padding-bottom: 0;
+}
+
+
+/* HERO SECTION */
+/* Sección principal destacada */
 .hero-section {
   position: relative;
   overflow: hidden;
 }
 
+/* Capa de superposición con gradiente y desenfoque */
 .hero-overlay {
   background: linear-gradient(45deg, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
   backdrop-filter: blur(2px);
 }
 
+/* Título con sombra y animación */
 .hero-section h1 {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   animation: fadeInUp 1s ease-out;
 }
 
+/* Párrafo con sombra y animación retardada */
 .hero-section p {
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   animation: fadeInUp 1s ease-out 0.3s both;
 }
 
-/* Animaciones */
+/* ANIMACIONES */
+/* Animación de aparición desde abajo */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -69,11 +164,13 @@ body {
   }
 }
 
+/* Animación de fade in simple */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* Animación de entrada desde la izquierda */
 @keyframes slideInLeft {
   from {
     opacity: 0;
@@ -85,6 +182,7 @@ body {
   }
 }
 
+/* Animación de entrada desde la derecha */
 @keyframes slideInRight {
   from {
     opacity: 0;
@@ -96,40 +194,47 @@ body {
   }
 }
 
-/* Efectos hover mejorados */
+/* EFECTOS HOVER MEJORADOS */
+/* Tarjetas con sombra y transición */
 .card {
   transition: var(--transition);
   border: none;
   box-shadow: var(--shadow-sm);
 }
 
+/* Efecto de elevación al hacer hover en la tarjeta */
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 
+/* Botones con transición y bordes redondeados */
 .btn {
   transition: var(--transition);
   border-radius: var(--border-radius);
   font-weight: 500;
 }
 
+/* Efecto de elevación al hacer hover en el botón */
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow);
 }
 
-/* Acordeones mejorados */
+/* ACORDEONES MEJORADOS */
+/* Botón de acordeón con bordes redondeados y transición */
 .accordion-button {
   border-radius: var(--border-radius) !important;
   font-weight: 600;
   transition: var(--transition);
 }
 
+/* Sombra cuando el acordeón está abierto */
 .accordion-button:not(.collapsed) {
   box-shadow: var(--shadow-sm);
 }
 
+/* Item de acordeón sin borde y con margen inferior */
 .accordion-item {
   border: none;
   margin-bottom: 1rem;
@@ -137,42 +242,49 @@ body {
   overflow: hidden;
 }
 
-/* Tablas mejoradas */
+/* TABLAS MEJORADAS */
+/* Tablas con bordes redondeados y overflow oculto */
 .table {
   border-radius: var(--border-radius);
   overflow: hidden;
 }
 
+/* Efecto hover en filas de tabla */
 .table-hover tbody tr:hover {
   background-color: rgba(13, 110, 253, 0.05);
   transform: scale(1.01);
   transition: var(--transition);
 }
 
-/* Modales mejorados */
+/* MODALES MEJORADOS */
+/* Contenido del modal con sombra y bordes redondeados */
 .modal-content {
   border: none;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-lg);
 }
 
+/* Encabezado del modal con línea inferior suave */
 .modal-header {
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-/* Formularios mejorados */
+/* FORMULARIOS MEJORADOS */
+/* Campos de formulario con bordes redondeados y transición */
 .form-control {
   border-radius: var(--border-radius);
   border: 2px solid #e9ecef;
   transition: var(--transition);
 }
 
+/* Efecto de foco en campos de formulario */
 .form-control:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-/* Imágenes con zoom mejorado */
+/* IMÁGENES CON ZOOM MEJORADO */
+/* Contenedor de imagen con sombra y transición */
 .zoom-img {
   overflow: hidden;
   display: block;
@@ -181,10 +293,12 @@ body {
   transition: var(--transition);
 }
 
+/* Sombra más intensa al hacer hover */
 .zoom-img:hover {
   box-shadow: var(--shadow-lg);
 }
 
+/* Imagen con transición de escala y ajuste de tamaño */
 .zoom-img img {
   transition: transform 0.4s ease;
   object-fit: cover;
@@ -192,50 +306,27 @@ body {
   height: 100%;
 }
 
+/* Efecto de zoom al hacer hover en la imagen */
 .zoom-img:hover img {
   transform: scale(1.1);
 }
 
-/* Descripción con efecto de expansión */
-.descripcion {
-  max-height: 25px;
-  overflow: hidden;
-  position: relative;
-  padding-bottom: 10px;
-  transition: max-height 0.3s ease;
-}
-
-.descripcion:hover {
-  max-height: 100px;
-}
-
-.descripcion.expandida {
-  max-height: none;
-}
-
-.boton {
-  position: absolute;
-  bottom: 1px;
-  right: 1px;
-  background-color: white;
-  color: #8f8f8f;
-  border: none;
-  cursor: pointer;
-}
-
-/* Estilos para mapa interactivo con SVG overlay */
+/* MAPA INTERACTIVO CON SVG OVERLAY */
+/* Contenedor del mapa con posición relativa */
 .mapa-svg-container {
   position: relative;
   display: inline-block;
   max-width: 100%;
 }
 
+/* Imagen base del mapa */
 .mapa-imagen-svg {
   width: 100%;
   height: auto;
   display: block;
 }
 
+/* SVG superpuesto sobre la imagen */
 .mapa-overlay-svg {
   position: absolute;
   top: 0;
@@ -246,7 +337,8 @@ body {
   z-index: 1; /* Asegura que esté encima de la imagen */
 }
 
-/* Estilos para las áreas SVG - Zonas invisibles con hover elegante */
+/* ÁREAS SVG INTERACTIVAS */
+/* Áreas invisibles por defecto, activas al hover */
 .area-svg {
   cursor: pointer;
   pointer-events: all; /* Habilita eventos solo en las áreas */
@@ -256,6 +348,7 @@ body {
   stroke-width: 0;
 }
 
+/* Efecto visual al hacer hover en el área SVG */
 .area-svg:hover {
   fill: rgba(0, 123, 255, 0.2) !important;
   stroke: rgba(0, 123, 255, 0.8) !important;
@@ -263,13 +356,14 @@ body {
   filter: drop-shadow(0 0 8px rgba(0, 123, 255, 0.4));
 }
 
+/* Efecto visual al hacer click (active) en el área SVG */
 .area-svg:active {
   fill: rgba(0, 123, 255, 0.3) !important;
   stroke: rgba(0, 123, 255, 1) !important;
   stroke-width: 3 !important;
 }
 
-/* Responsive adjustments para SVG */
+/* RESPONSIVE PARA SVG */
 @media (max-width: 768px) {
   .area-svg:hover {
     fill: rgba(0, 123, 255, 0.3) !important;
@@ -279,43 +373,47 @@ body {
   }
 }
 
-/* ===== ESTILOS ADICIONALES MODERNOS ===== */
+/* 
+  ESTILOS ADICIONALES MODERNOS
+  Ajustes responsivos y componentes adicionales
+*/
 
-/* Responsive mejorado general */
+/* RESPONSIVE GENERAL */
 @media (max-width: 768px) {
   .hero-section h1 {
-    font-size: 2rem;
+    font-size: 2rem; /* Título más pequeño en pantallas medianas */
   }
   
   .hero-section p {
-    font-size: 1rem;
+    font-size: 1rem; /* Párrafo más pequeño */
   }
   
   .table-responsive {
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* Tablas más compactas */
   }
   
   .btn-lg {
     padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    font-size: 1rem; /* Botón grande más pequeño */
   }
 }
 
 @media (max-width: 576px) {
   .hero-section h1 {
-    font-size: 1.75rem;
+    font-size: 1.75rem; /* Título aún más pequeño en móviles */
   }
   
   .card-body {
-    padding: 1rem;
+    padding: 1rem; /* Menos padding en tarjetas */
   }
   
   .modal-dialog {
-    margin: 0.5rem;
+    margin: 0.5rem; /* Menos margen en modales */
   }
 }
 
-/* Efectos especiales para el mapa */
+/* EFECTOS ESPECIALES PARA EL MAPA */
+/* Contenedor del mapa con sombra y bordes redondeados */
 #contenedor-mapa {
   position: relative;
   border-radius: var(--border-radius);
@@ -323,57 +421,68 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+/* Imagen del mapa ajustada al contenedor */
 #contenedor-mapa img {
   width: 100%;
   height: auto;
   display: block;
 }
 
-/* Loading states */
+/* ESTADOS DE CARGA */
+/* Elementos en estado de carga */
 .loading {
   opacity: 0.6;
   pointer-events: none;
 }
 
+/* Spinner pequeño */
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
 }
 
-/* Alertas mejoradas */
+/* ALERTAS MEJORADAS */
+/* Alertas con sombra y bordes redondeados */
 .alert {
   border: none;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
 }
 
+/* Botón de cierre de alerta con padding */
 .alert-dismissible .btn-close {
   padding: 0.75rem 1rem;
 }
 
-/* Navbar mejorado */
+/* NAVBAR MEJORADO */
+/* Marca de navbar en negrita */
 .navbar-brand {
   font-weight: 700;
 }
 
+/* Enlaces de navbar con transición */
 .nav-link {
   font-weight: 500;
   transition: var(--transition);
 }
 
+/* Color destacado al hacer hover en navbar */
 .nav-link:hover {
   color: var(--primary-color) !important;
 }
 
-/* Footer mejorado */
+/* FOOTER MEJORADO */
+/* Fondo con gradiente en el footer */
 footer {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
 }
 
+/* Transición en enlaces del footer */
 footer a {
   transition: var(--transition);
 }
 
+/* Efecto de elevación y color en hover en el footer */
 footer a:hover {
   transform: translateY(-2px);
   color: var(--warning-color) !important;

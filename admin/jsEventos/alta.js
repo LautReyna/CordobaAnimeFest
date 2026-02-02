@@ -1,3 +1,4 @@
+// Importaciones de utilidades y funciones
 import {
     procesarFormulario,
     procesarFormularioConArchivo,
@@ -15,11 +16,13 @@ import {
     renderizarListadoEventos
 } from './funciones.js'
 
+//Referencias a los elementos del DOM
 const formulario = document.getElementById('form-evento')
 const mensajes = document.getElementById('mensajes')
 const botonEliminar = document.getElementById('eliminar-evento')
 const botonCancelar = document.getElementById('cancelar-evento')
 
+// Event listener para el formulario de creación o modificación de evento
 formulario.addEventListener('submit', async (e) => {
     e.preventDefault()
 
@@ -38,13 +41,15 @@ formulario.addEventListener('submit', async (e) => {
 
     const datosFormulario = procesarFormularioConArchivo(formulario)
     
-    // Obtener el nombre del evento para validación
+    // limpiar espacios en blanco del nombre del evento
     const nombreEvento = datosFormulario.get('nombre')
     if(nombreEvento){
         datosFormulario.set('nombre', nombreEvento.trimEnd())
     }
 
+    // Determinar si se esta creando o modificando el evento
     if(!idEvento){
+        // CREACION DE EVENTO
         try{
             console.log('Creando evento con FormData:', datosFormulario)
             const respuesta = await altaRegistroConArchivo(
@@ -55,6 +60,7 @@ formulario.addEventListener('submit', async (e) => {
             const resultado = await respuesta.json()
             mostrarMensaje(mensajes, resultado.mensaje || 'Evento dado de alta correctamente', 'success')
 
+            // Limpiar el formulario y actualizar el listado de eventos
             limpiarFormulario(formulario)
             const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
             const eventosActualizados = await resActualizado.json()
@@ -65,6 +71,7 @@ formulario.addEventListener('submit', async (e) => {
             mostrarMensaje(mensajes, 'No se pudo dar de alta el registro', 'danger')
         }
     }else{
+        // MODIFICACION DE EVENTO
         try{
             console.log('Modificando evento con FormData:', datosFormulario)
             const respuesta = await altaRegistroConArchivo(
@@ -75,6 +82,7 @@ formulario.addEventListener('submit', async (e) => {
             const datos = await respuesta.json()
             mostrarMensaje(mensajes, datos.mensaje || 'Evento modificado correctamente', 'success')
 
+            // Limpiar el formulario y actualizar el listado de eventos
             limpiarFormulario(formulario)
             const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
             const eventosActualizados = await resActualizado.json()
@@ -89,17 +97,20 @@ formulario.addEventListener('submit', async (e) => {
     
 })
 
+// Event listener para el boton de eliminacion de evento
 botonEliminar.addEventListener('click', async (e) => {
     e.preventDefault()
 
     const nombreIngresado = formulario.nombre.value
 
+    // Validar que se haya ingresado un nombre de evento
     if(!nombreIngresado){
         mostrarMensaje(mensajes, 'Ingrese el nombre del evento a eliminar.', 'warning')
         return
     }    
 
     try{
+        // Buscar el evento por el nombre
         const respuesta = await obtenerRegistros('/api/v1/eventos/caf/activa')
         const datosEventos = await respuesta.json()
         const eventoEncontrado = datosEventos.find(e => e.nombre.toLowerCase() === nombreIngresado.toLowerCase())
@@ -109,6 +120,7 @@ botonEliminar.addEventListener('click', async (e) => {
             return;
         }
 
+        // Confirmar la eliminacion del evento
         if (confirm(`¿Eliminar el evento "${eventoEncontrado.nombre}"?`)) {
             const eliminar = await eliminarRegistro(`/api/v1/eventos/${eventoEncontrado.id}`)
             const resultado = await eliminar.json()
@@ -116,6 +128,7 @@ botonEliminar.addEventListener('click', async (e) => {
             if (eliminar.ok) {
                 mostrarMensaje(mensajes, resultado.mensaje || 'Evento eliminado correctamente.', 'success')
                 
+                // Limpiar el formulario y actualizar el listado de eventos
                 limpiarFormulario(formulario)
                 const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
                 const eventosActualizados = await resActualizado.json()
@@ -131,26 +144,29 @@ botonEliminar.addEventListener('click', async (e) => {
     }
 })
 
+// Event listener para el boton de cancelacion de evento
 botonCancelar.addEventListener('click', async (e) => {
     e.preventDefault()
     const nombreIngresado = formulario.nombre.value
 
+    // Validar que se haya ingresado un nombre de evento
     if(!nombreIngresado){
         mostrarMensaje(mensajes, 'Ingrese el nombre del evento a cancelar.', 'warning')
         return
     }
 
     try{
+        // Buscar el evento por el nombre
         const respuesta = await obtenerRegistros('/api/v1/eventos/caf/activa')
         const datosEventos = await respuesta.json()
         const eventoEncontrado = datosEventos.find(e => e.nombre.toLowerCase() === nombreIngresado.toLowerCase())
 
-        console.log(eventoEncontrado)
         if (!eventoEncontrado) {
             mostrarMensaje(mensajes, 'No se encontró un evento con ese nombre.', 'warning')
             return;
         }
 
+        // Confirmar la cancelacion del evento
         if (confirm(`Cancelar el evento "${eventoEncontrado.nombre}"?`)) {
             const cancelar = await cancelarRegistro(`/api/v1/eventos/cancelar/${eventoEncontrado.id}`)
             const resultado = await cancelar.json()
@@ -158,6 +174,7 @@ botonCancelar.addEventListener('click', async (e) => {
             if (cancelar.ok) {
                 mostrarMensaje(mensajes, resultado.mensaje || 'Evento cancelado correctamente.', 'success')
                 
+                // Limpiar el formulario y actualizar el listado de eventos
                 limpiarFormulario(formulario)
                 const resActualizado = await obtenerRegistros('/api/v1/eventos/caf/activa')
                 const eventosActualizados = await resActualizado.json()
@@ -173,6 +190,7 @@ botonCancelar.addEventListener('click', async (e) => {
     }
 })
 
+// Cargar datos iniciales y configurar formulario
 const resultado = await obtenerRegistros('/api/v1/eventos/caf/activa')
 const datosEventos = await resultado.json()
 await renderizarFormularioPorNombre(datosEventos, formulario, mensajes)

@@ -1,5 +1,7 @@
+// Importa el pool de conexión a la base de datos
 import pool from '../../../../conexion/conexion.bd.mjs'
 
+// Vincula un evento a una edición de CAF específica
 async function vincularEventoCaf(idEvento, idCaf){
     try{
         await pool.query(
@@ -12,6 +14,7 @@ async function vincularEventoCaf(idEvento, idCaf){
     }
 }
 
+// Obtiene todos los eventos asociados a una CAF específica
 async function obtenerEventosCaf(idCaf){
     try{
         const resultado = await pool.query(
@@ -25,6 +28,7 @@ async function obtenerEventosCaf(idCaf){
     }
 }
 
+// Obtiene todos los eventos de la CAF activa, incluyendo información de zona y caf
 async function obtenerEventosCafActiva(){
     try{
         const resultado = await pool.query(`
@@ -55,6 +59,7 @@ async function obtenerEventosCafActiva(){
     }
 }
 
+// Obtiene todos los eventos registrados en la base de datos
 async function obtenerEventos(){
     try{
         const resultado = await pool.query('SELECT * FROM evento')
@@ -65,6 +70,7 @@ async function obtenerEventos(){
     }
 }
 
+// Obtiene un evento específico por su ID
 async function obtenerEvento(id){
     try{
         const resultado = await pool.query(
@@ -78,6 +84,7 @@ async function obtenerEvento(id){
     }
 }
 
+// Crea un nuevo evento en la base de datos
 async function crearEvento(evento){
     try{
         const {
@@ -88,6 +95,7 @@ async function crearEvento(evento){
             descripcion,
             imagen
         } = evento
+        // Construye la ruta de la imagen para guardar en la base de datos
         const rutaImagen = `/recursos/${imagen}`
         
         const resultado = await pool.query(
@@ -107,6 +115,7 @@ async function crearEvento(evento){
     }
 }
 
+// Modifica un evento existente en la base de datos
 async function modificarEvento(id, evento ={}){
     try{
         const {
@@ -117,6 +126,7 @@ async function modificarEvento(id, evento ={}){
             descripcion,
             imagen
         } = evento
+        // Construye la ruta de la imagen para guardar en la base de datos
         const rutaImagen = `/recursos/${imagen}`
         
         const resultado = await pool.query(
@@ -141,6 +151,7 @@ async function modificarEvento(id, evento ={}){
     }
 }
 
+// Elimina un evento específico por su ID
 async function eliminarEvento(id){
     try{
         const resultado = await pool.query(
@@ -156,6 +167,7 @@ async function eliminarEvento(id){
     }
 }
 
+// Cancela un evento (cambia su estado a 'Cancelado') por su ID
 async function cancelarEvento(id){
     try{
         const resultado = await pool.query(
@@ -172,6 +184,7 @@ async function cancelarEvento(id){
     }
 }
 
+// Exporta todas las funciones del modelo
 export{
     vincularEventoCaf,
     obtenerEventosCaf,

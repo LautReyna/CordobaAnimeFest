@@ -1,10 +1,12 @@
+// Importaciones de utilidades y funciones
 import { obtenerRegistros, mostrarMensaje, altaRegistroConArchivo } from "../recursos/utilidades.js"
 import { renderizarListadoEventos } from "../jsEventos/funciones.js"
 import { renderizarListadoStands } from "../jsStands/funciones.js"
 
-
+// Funcion principal para crear enlaces de navegacion segun permisos del usuario
 export async function crearEnlaces() {
     try {
+      // Obtener datos del usuario autenticado
       const respuesta = await fetch('/miUsuario', { credentials: "include" })
       if (!respuesta.ok) throw Error('No autenticado')
   
@@ -12,10 +14,12 @@ export async function crearEnlaces() {
       const enlaces = document.getElementById('enlaces')
       const mensaje = document.getElementById('mensaje-bienvenida')
       const contenedorCaf = document.getElementById('contenedor-caf')
-      
+
+      // Obtener datos de la CAF activa
       const resCaf = await obtenerRegistros('/api/v1/caf/activa')
       const cafActiva = await resCaf.json()
 
+      // Crear boton de logout
       enlaces.innerHTML = `
         <li class="nav-item">
           <button id="btn-logout" class="btn btn-danger">
@@ -23,12 +27,14 @@ export async function crearEnlaces() {
           </button>
         </li>
       `
+      // Crear mensaje de bienvenida
       if(mensaje){
         mensaje.innerHTML = `
           <h1 class="d-flex justify-content-center title">BIENVENIDO ${usuario.nombre.toUpperCase()}</h1> 
         `
       }
   
+      // Crear enlaces segun categoria del usuario
       if (usuario.categoria === 'Eventos' || usuario.categoria === 'Admin') {
         enlaces.insertAdjacentHTML("afterbegin", `
           <li class="nav-item"><a href="/admin/eventos.html" class="nav-link">Eventos</a></li>
@@ -45,9 +51,11 @@ export async function crearEnlaces() {
           <li class="nav-item"><a href="/admin/auditoria.html" class="nav-link">Auditoria</a></li>
         `)
   
+        // Renderizar interfaz de gestion de CAF
         if(contenedorCaf){
           contenedorCaf.innerHTML = ''
           if(cafActiva){
+            // Mostrar CAF activa con opciones de gestion
             contenedorCaf.innerHTML = `
               <div class="container">
                 <div class="row justify-content-center">
@@ -121,6 +129,7 @@ export async function crearEnlaces() {
               </div>
             `
           }else{
+            // Mostrar formulario de creacion de CAF
             contenedorCaf.innerHTML = `
               <div class="container">
                 <div class="row justify-content-center">
@@ -190,6 +199,7 @@ export async function crearEnlaces() {
     }
 }
 
+// Funcion para verificar si hay una CAF activa
 export async function verificarCafActiva(){
   try{
     const respuesta = await fetch('/caf/activa')
@@ -198,6 +208,7 @@ export async function verificarCafActiva(){
     const section = document.getElementById('section-gestor')
 
     if(!datos.activa){
+      // Mostrar mensaje si no hay una CAF activa
       section.innerHTML = `
         <div class="alert alert-warning text-center mt-5">
           No hay una CAF activa. Pídele al Admin que active una.
@@ -212,7 +223,7 @@ export async function verificarCafActiva(){
   }
 }
 
-// Función auxiliar para actualizar el comboBox
+// Función auxiliar para actualizar el comboBox de CAF
 export function actualizarComboBox(idCaf) {
   const combos = document.querySelectorAll('.cbCaf')
   combos.forEach(cb => {
@@ -221,6 +232,7 @@ export function actualizarComboBox(idCaf) {
   })
 }
 
+// Función para cargar el comboBox de CAF
 export async function cargarComboBox(datosCaf, cafActiva = null){
   try {
     const combos = document.querySelectorAll('.cbCaf')
@@ -239,6 +251,7 @@ export async function cargarComboBox(datosCaf, cafActiva = null){
   }
 }
 
+// Función para manejar cambios en el comboBox de CAF
 export async function cambiarComboBox(datosCaf, callback){
   try{
     const combos = document.querySelectorAll('.cbCaf')
@@ -270,6 +283,7 @@ export async function cambiarComboBox(datosCaf, callback){
   }
 }
 
+// Función para mostrar eventos segun la CAF seleccionada
 export async function mostrarEventosSegunCaf(idCaf, cafSeleccionada) {
   const sectionGestor = document.getElementById('section-gestor')
   const sectionPasada = document.getElementById('section-pasada')
@@ -281,10 +295,12 @@ export async function mostrarEventosSegunCaf(idCaf, cafSeleccionada) {
   const eventos = await res.json()
 
   if (cafSeleccionada.activa) {
+    // Mostrar eventos de CAF activa
     sectionGestor.classList.remove('hidden')
     sectionPasada.classList.add('hidden')
     renderizarListadoEventos(eventos, 'contenedor-eventos')
   } else {
+    // Mostrar eventos de CAF pasada
     sectionPasada.classList.remove('hidden')
     sectionGestor.classList.add('hidden')
 
@@ -292,6 +308,7 @@ export async function mostrarEventosSegunCaf(idCaf, cafSeleccionada) {
   }
 }
 
+// Función para mostrar stands segun la CAF seleccionada
 export async function mostrarStandsSegunCaf(idCaf, cafSeleccionada) {
   const sectionGestor = document.getElementById('section-gestor')
   const sectionPasada = document.getElementById('section-pasada')
@@ -303,10 +320,12 @@ export async function mostrarStandsSegunCaf(idCaf, cafSeleccionada) {
   const stands = await res.json()
 
   if (cafSeleccionada.activa) {
+    // Mostrar stands de CAF activa
     sectionGestor.classList.remove('hidden')
     sectionPasada.classList.add('hidden')
     renderizarListadoStands(stands, 'contenedor-stands')
   } else {
+    // Mostrar stands de CAF pasada
     sectionPasada.classList.remove('hidden')
     sectionGestor.classList.add('hidden')
 
@@ -314,17 +333,17 @@ export async function mostrarStandsSegunCaf(idCaf, cafSeleccionada) {
   }
 }
 
+// Función para renderizar el formulario de modificacion de CAF
 export function renderizarFormulario(datosCaf){
   try {
       document.querySelector('#form-modificar-caf input[name="id"]').value = datosCaf.id
       document.querySelector('#form-modificar-caf input[name="fecha"]').value = datosCaf.fecha
-      // No establecer el valor del input file por seguridad del navegador
-      // El usuario puede elegir mantener el archivo actual o subir uno nuevo
   } catch (error) {
       console.log(error)
   }
 }
 
+// Función para cargar el comboBox de zonas
 export async function cargarComboBoxZonas(contenedorId) {
   try {
     const contenedorZonas = document.getElementById(contenedorId)
@@ -350,6 +369,7 @@ export async function cargarComboBoxZonas(contenedorId) {
   }
 }
 
+// Función para cerrar sesión
 export function cerrarSesion(){
     document.getElementById('enlaces').addEventListener('click', async (e) => {
         if (e.target.id === 'btn-logout' || e.target.closest('#btn-logout')) {
@@ -363,8 +383,7 @@ export function cerrarSesion(){
     })
 }
 
-// ===== FUNCIONES DEL MODAL DE ZONAS =====
-
+// FUNCIONES DEL MODAL DE ZONAS
 // Variables globales para el modal de zonas
 let zonasProcesadas = []
 let formDataCaf = null

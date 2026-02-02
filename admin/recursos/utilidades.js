@@ -1,13 +1,16 @@
+// Función para procesar el formulario sin archivo(convierte formData a objeto)
 export function procesarFormulario(formulario) {
     const datosFormulario = new FormData(formulario)
     return Object.fromEntries(datosFormulario)
 }
 
+// Función para procesar el formulario con archivo(mantiene formData)
 export function procesarFormularioConArchivo(formulario) {
     const datosFormulario = new FormData(formulario)
     return datosFormulario
 }
 
+// Función para dar de alta un registro
 export async function altaRegistro(ruta, metodo, datos) {
     try {
         const respuesta = await fetch(ruta, {
@@ -24,6 +27,7 @@ export async function altaRegistro(ruta, metodo, datos) {
     }
 }
 
+// Función para dar de alta un registro con archivo
 export async function altaRegistroConArchivo(ruta, metodo, formData) {
     try {
         const respuesta = await fetch(ruta, {
@@ -37,6 +41,7 @@ export async function altaRegistroConArchivo(ruta, metodo, formData) {
     }
 }
 
+// Función para eliminar un registro
 export async function eliminarRegistro(ruta) {
     try {
         const respuesta = await fetch(ruta, {
@@ -49,6 +54,7 @@ export async function eliminarRegistro(ruta) {
     }
 }
 
+// Función para cancelar un registro
 export async function cancelarRegistro(ruta) {
     try{
         const respuesta = await fetch(ruta, {
@@ -61,6 +67,7 @@ export async function cancelarRegistro(ruta) {
     }
 }
 
+// Función para obtener registros
 export async function obtenerRegistros(ruta) {
     try {
         return await fetch(ruta)
@@ -70,6 +77,7 @@ export async function obtenerRegistros(ruta) {
     }
 }
 
+// Función para limpiar el formulario
 export function limpiarFormulario(formulario){
     try {
       if(formulario){
@@ -81,7 +89,9 @@ export function limpiarFormulario(formulario){
     }
 }
 
+// Función para mostrar un mensaje
 export function mostrarMensaje(mensajes, texto, tipo = 'info', duracion = 5000){
+    // Configuracion de estilos para cada tipo de mensaje
     const alertConfig = {
         'success': {
             class: 'alert-success',
@@ -105,8 +115,10 @@ export function mostrarMensaje(mensajes, texto, tipo = 'info', duracion = 5000){
         }
     }
     
+    // Obtener la configuracion del tipo de mensaje
     const config = alertConfig[tipo] || alertConfig['info']
     
+    // Insertar el mensaje en el contenedor
     mensajes.innerHTML = `
         <div class="alert ${config.class} alert-dismissible fade show shadow-sm border-0" role="alert">
             <div class="d-flex align-items-center">

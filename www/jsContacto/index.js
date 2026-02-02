@@ -1,3 +1,4 @@
+// Importa las funciones necesarias
 import { 
     procesarFormularioContacto, 
     enviarMensajeContacto, 
@@ -5,44 +6,47 @@ import {
     limpiarFormulario 
 } from './funciones.js'
 
-// Función para inicializar el formulario de contacto
+// Función principal para inicializar el formulario de contacto
 function inicializarFormularioContacto() {
+    // Obtiene el formulario por su ID
     const formulario = document.getElementById('form-evento')
+    // Crea un contenedor para mostrar mensajes al usuario
     const mensajesContainer = document.createElement('div')
     mensajesContainer.id = 'mensajes-contacto'
     
-    // Insertar contenedor de mensajes después del formulario
+    // Inserta el contenedor de mensajes justo después del formulario
     formulario.parentNode.insertBefore(mensajesContainer, formulario.nextSibling)
     
-    // Event listener para el formulario
+    // Agrega un listener para el evento submit del formulario
     formulario.addEventListener('submit', async (e) => {
-        e.preventDefault()
+        e.preventDefault() // Previene el envío tradicional del formulario
         
         try {
-            // Procesar datos del formulario
+            // Procesa los datos del formulario y los convierte en objeto
             const datos = procesarFormularioContacto(formulario)
             
-            // Mostrar mensaje de carga
+            // Muestra un mensaje de información mientras se envía el mensaje
             mostrarMensaje(mensajesContainer, 'Enviando mensaje...', 'info')
             
-            // Enviar mensaje
+            // Envía el mensaje al backend
             const resultado = await enviarMensajeContacto(datos)
             
-            // Mostrar mensaje de éxito
+            // Muestra mensaje de éxito con la respuesta del backend
             mostrarMensaje(mensajesContainer, resultado.mensaje, 'success')
             
-            // Limpiar formulario
+            // Limpia el formulario después de enviar correctamente
             limpiarFormulario(formulario)
             
         } catch (error) {
-            // Mostrar mensaje de error
+            // Si ocurre un error, muestra el mensaje de error al usuario
             mostrarMensaje(mensajesContainer, error.message, 'error')
         }
     })
     
-    // Event listener para botón cancelar
+    // Busca el botón de cancelar dentro del formulario
     const botonCancelar = formulario.querySelector('.btn-danger')
     if (botonCancelar) {
+        // Agrega un listener para limpiar el formulario y los mensajes al cancelar
         botonCancelar.addEventListener('click', (e) => {
             e.preventDefault()
             limpiarFormulario(formulario)
@@ -51,5 +55,5 @@ function inicializarFormularioContacto() {
     }
 }
 
-// Inicializar cuando se carga la página
+// Inicializa la lógica cuando el DOM está completamente cargado
 document.addEventListener('DOMContentLoaded', inicializarFormularioContacto)

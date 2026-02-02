@@ -1,5 +1,7 @@
+// Función para renderizar el formulario de edición con datos del usuario
 export function renderizarFormularioUsuario(datosUsuario){
     try {
+        // Rellenar el formulario con los datos del usuario
         document.querySelector('#form-editar-usuario input[name="id"]').value = datosUsuario.id
         document.querySelector('#form-editar-usuario input[name="nombre"]').value = datosUsuario.nombre
         document.querySelector('#form-editar-usuario input[name="contrasena"]').value = ''
@@ -9,11 +11,13 @@ export function renderizarFormularioUsuario(datosUsuario){
     }
 }
 
+// Función para renderizar el listado de usuarios
 export function renderizarListadoUsuario(datosUsuarios) {
     try {
         const contenedorUsuarios = document.getElementById('contenedor-usuarios')
         let filas = ''
 
+        // Crear filas para cada usuario
         datosUsuarios.forEach((usuario) => {
             filas += `
                 <tr>
@@ -36,12 +40,14 @@ export function renderizarListadoUsuario(datosUsuarios) {
                 </tr>
             `
         })
+        // Insertar las filas en el contenedor
         contenedorUsuarios.innerHTML = filas
     } catch (error) {
         console.log(error)
     }
 }
 
+// Función para mostrar/ocultar la contraseña en el formulario de alta
 export function mostrarContrasenaAlta(){
     document.addEventListener('DOMContentLoaded', ()=>{
         const cambiarContrasena = document.getElementById('alta-cambiar-contrasena')
@@ -49,9 +55,11 @@ export function mostrarContrasenaAlta(){
     
         if(cambiarContrasena && contrasena){
             cambiarContrasena.addEventListener('click', ()=>{
+                // Cambiar entre tipo password y text
                 const type = contrasena.getAttribute('type') === 'password' ? 'text' : 'password'
                 contrasena.setAttribute('type', type)
                 
+                // Cambiar icono del boton
                 const icon = cambiarContrasena.querySelector('i');
                 if (type === 'password') {
                     icon.classList.remove('bi-eye-slash');
@@ -65,6 +73,7 @@ export function mostrarContrasenaAlta(){
     })
 }
 
+// Función para mostrar/ocultar la contraseña en el formulario de edición
 export function mostrarContrasenaEditar(){
     document.addEventListener('DOMContentLoaded', ()=>{
         const cambiarContrasena = document.getElementById('editar-cambiar-contrasena')
@@ -72,9 +81,11 @@ export function mostrarContrasenaEditar(){
     
         if(cambiarContrasena && contrasena){
             cambiarContrasena.addEventListener('click', ()=>{
+                // Cambiar entre tipo password y text
                 const type = contrasena.getAttribute('type') === 'password' ? 'text' : 'password'
                 contrasena.setAttribute('type', type)
                 
+                // Cambiar icono del boton
                 const icon = cambiarContrasena.querySelector('i');
                 if (type === 'password') {
                     icon.classList.remove('bi-eye-slash');

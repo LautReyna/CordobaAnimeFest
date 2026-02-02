@@ -1,6 +1,8 @@
+// Importa el modelo de stands y el pool de conexión a la base de datos
 import * as modelo from './modelo.stands.mjs'
 import pool from '../../../../conexion/conexion.bd.mjs'
 
+// Obtiene todos los stands asociados a una edición de CAF específica.
 async function obtenerStandsCaf(req, res){
     try {
         const { idCaf } = req.params
@@ -12,6 +14,7 @@ async function obtenerStandsCaf(req, res){
     }
 }
 
+// Obtiene todos los stands de la CAF activa.
 async function obtenerStandsCafActiva(req, res){
     try{
         const resultado = await modelo.obtenerStandsCafActiva()
@@ -22,6 +25,7 @@ async function obtenerStandsCafActiva(req, res){
     }
 }
 
+// Obtiene todos los stands registrados en la base de datos.
 async function obtenerStands(req, res) {
     try {
         const resultado = await modelo.obtenerStands()
@@ -32,6 +36,7 @@ async function obtenerStands(req, res) {
     }
 }
 
+// Obtiene un stand específico por su ID.
 async function obtenerStand(req, res) {
     try {
         const { id } = req.params
@@ -43,6 +48,7 @@ async function obtenerStand(req, res) {
     }
 }
 
+// Crea un nuevo stand y lo vincula a la CAF activa.
 async function crearStand(req, res) {
     try {
         const {
@@ -50,9 +56,12 @@ async function crearStand(req, res) {
             descripcion,
             ubicacion
         } = req.body
+
         if (!nombre || !descripcion || !ubicacion) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
+
+        // Busca la CAF activa para asociar el stand
         const resultadoCaf = await pool.query('SELECT id FROM caf WHERE activa = true')
 
         if(resultadoCaf.rows.length === 0){
@@ -67,6 +76,8 @@ async function crearStand(req, res) {
             ubicacion
         })
         const standCreado = resultado.rows[0]
+
+        // Vincula el stand creado a la CAF activa
         await modelo.vincularStandCaf(standCreado.id, idCaf)
         
         res.json({ mensaje: `Stand ${standCreado.nombre} dado de alta` })
@@ -76,6 +87,7 @@ async function crearStand(req, res) {
     }
 }
 
+// Modifica un stand existente.
 async function modificarStand(req, res) {
     try {
         const { id } = req.params
@@ -88,6 +100,7 @@ async function modificarStand(req, res) {
         if (!nombre || !descripcion || !ubicacion) {
             return res.status(400).json({ mensaje: 'Datos incompletos' })
         }
+
         const resultado = await modelo.modificarStand(id, {
             nombre, 
             descripcion,
@@ -101,6 +114,7 @@ async function modificarStand(req, res) {
     }
 }
 
+// Elimina un stand específico por su ID.
 async function eliminarStand(req, res) {
     try {
         const { id } = req.params
@@ -116,4 +130,6 @@ async function eliminarStand(req, res) {
         res.status(500).json({ mensaje: 'Error en el servidor' })
     }
 }
+
+// Exporta todas las funciones del controlador
 export { obtenerStandsCaf, obtenerStandsCafActiva, obtenerStands, obtenerStand, crearStand, modificarStand, eliminarStand }

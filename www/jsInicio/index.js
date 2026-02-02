@@ -1,3 +1,4 @@
+// Importa las funciones necesarias
 import { 
     obtenerRegistros, 
     carteleraMeet, 
@@ -7,36 +8,38 @@ import {
     modalMapa
 } from './funciones.js'
 
-// Función para manejar clicks en botones "Programar Alerta"
+// Esta función configura el evento click para los botones "Programar Alerta"
 function configurarBotonesProgramarAlerta() {
     document.addEventListener('click', async (e) => {
+        // Busca el botón más cercano con la clase .btn-programar-alerta
         const btn = e.target.closest('.btn-programar-alerta')
-        if (!btn) return
+        if (!btn) return // Si no es el botón, no hace nada
         e.preventDefault()
 
-        // Determinar idEvento
+        // Intenta obtener el id del evento desde el atributo data-event-id
         let idEvento = btn.dataset.eventId
         
         if (!idEvento) {
-            // Buscar item activo del carousel dentro del mismo modal
+            // Si no lo encuentra, busca el item activo del carousel dentro del mismo modal
             const modal = btn.closest('.modal')
             const activeItem = modal?.querySelector('.carousel-item.active')
             idEvento = activeItem?.dataset.eventId
         }
         
         if (!idEvento) {
+            // Si aún no encuentra el id, muestra una advertencia y termina
             console.warn('No se pudo determinar idEvento para programar alerta')
             return
         }
         
-        // Validar que idEvento sea un número válido
+        // Valida que el idEvento sea un número válido
         const idEventoNumero = parseInt(idEvento)
         if (isNaN(idEventoNumero)) {
             console.error('Error: idEvento no es un número válido:', idEvento)
             return
         }
         
-        
+        // Llama a la función global para abrir el modal de programar alerta, si existe
         if (window.abrirModalProgramarAlerta) {
             window.abrirModalProgramarAlerta(idEventoNumero)
         } else {
@@ -45,26 +48,27 @@ function configurarBotonesProgramarAlerta() {
     })
 }
 
-// Función principal para inicializar la página
+// Función principal para inicializar la página y cargar los datos
 async function inicializarPagina() {
     try {
-        // Obtener datos de la API
+        // Obtiene los datos de eventos y stands de la API en paralelo
         const [datosEventos, datosStands] = await Promise.all([
             obtenerRegistros('/api/v1/eventos/caf/activa'),
             obtenerRegistros('/api/v1/stands/caf/activa')
         ])
 
-        // Renderizar componentes
+        // Renderiza los diferentes componentes de la página con los datos obtenidos
         carteleraEventos(datosEventos)
         carteleraMeet(datosEventos)
         cronogramaEventos(datosEventos)
         renderizarMapa()
         modalMapa(datosEventos, datosStands)
 
-        // Configurar eventos
+        // Configura los eventos para los botones de programar alerta
         configurarBotonesProgramarAlerta()
         
     } catch (error) {
+        // Si ocurre un error, lo muestra en consola y notifica al usuario en los contenedores principales
         console.error('Error inicializando página:', error)
         // Mostrar mensaje de error al usuario si es necesario
         const contenedores = [
@@ -82,5 +86,5 @@ async function inicializarPagina() {
     }
 }
 
-// Inicializar cuando se carga la página
+// Cuando el DOM esté completamente cargado, inicializa la página
 document.addEventListener('DOMContentLoaded', inicializarPagina)

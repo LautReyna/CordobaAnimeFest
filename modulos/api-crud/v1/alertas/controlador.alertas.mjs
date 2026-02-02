@@ -1,8 +1,13 @@
+// Importa las funciones del modelo de alertas
 import { upsertAlertaUsuario, listarAlertasUsuario, eliminarAlertaUsuario } from './modelo.alertas.mjs'
 
+// Crea una nueva alerta o actualiza una existente para un usuario.
+// Si ya existe una alerta para el endpoint e idEvento, la actualiza; si no, la crea.
 export async function crearOActualizar(req, res){
     try{
         const { endpoint, idEvento, modo } = req.body || {}
+        
+        // Validar parámetros requeridos
         if(!endpoint || !idEvento){
             return res.status(400).json({ mensaje: 'endpoint e idEvento son requeridos' })
         }
@@ -14,6 +19,7 @@ export async function crearOActualizar(req, res){
     }
 }
 
+//Lista todas las alertas de un usuario específico según su endpoint.
 export async function listar(req, res){
     try{
         const { endpoint } = req.query
@@ -26,6 +32,7 @@ export async function listar(req, res){
     }
 }
 
+//Elimina una alerta específica de un usuario.
 export async function eliminar(req, res){
     try{
         const { id } = req.params
@@ -39,6 +46,5 @@ export async function eliminar(req, res){
         res.status(500).json({ mensaje: 'Error servidor' })
     }
 }
-
 
 
