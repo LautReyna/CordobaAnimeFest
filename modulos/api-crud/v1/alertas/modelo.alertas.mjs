@@ -22,7 +22,12 @@ export async function upsertAlertaUsuario(endpoint, idEvento, modo){
     }
     // Si no existe, crear una nueva alerta
     const ins = await pool.query('INSERT INTO alerta(endpoint, idEvento, modo) VALUES($1,$2,$3) RETURNING id',[endpoint, idEvento, modoValido])
+    //Incrementa en 1 la cantidad de notificaciones del evento
+    await pool.query(
+        `UPDATE evento SET notificaciones = notificaciones + 1 WHERE id = ${idEvento}`
+        )
     return { id: ins.rows[0].id, creado: true }
+    
 }
 
 // Obtiene todas las alertas de un usuario específico
@@ -46,8 +51,24 @@ export async function listarAlertasUsuario(endpoint){
 
 // Elimina una alerta específica de un usuario
 export async function eliminarAlertaUsuario(id, endpoint){
+    //Obtiene el id del evento relacionado para actualizar data de estadistica
+    const result = await pool.query(
+        `SELECT idEvento FROM alerta WHERE id = $1`,
+        [id]
+    );
+    const idEvento = result.rows[0].idEvento;
+
+    // Reduce en uno la columna notificaciones del evento relacionado
+    await pool.query(
+        `UPDATE evento 
+         SET notificaciones = notificaciones - 1 
+         WHERE id = $1`,
+        [idEvento]
+    );
+    //Elimina la notificacion del registro de la base de datos
     const del = await pool.query('DELETE FROM alerta WHERE id=$1 AND endpoint=$2 RETURNING id',[id, endpoint])
     return del.rowCount > 0
+    
 }
 
 

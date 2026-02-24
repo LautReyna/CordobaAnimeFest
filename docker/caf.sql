@@ -22,7 +22,8 @@ CREATE TABLE evento(
     estado VARCHAR(20),
     ubicacion INT REFERENCES zona(id),
     descripcion TEXT,
-    imagen VARCHAR(250)
+    imagen VARCHAR(250),
+    notificaciones INT
 );
 
 CREATE TABLE eventoCaf(
@@ -35,7 +36,8 @@ CREATE TABLE stand(
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50),
     descripcion TEXT,
-    ubicacion INT REFERENCES zona(id)
+    ubicacion INT REFERENCES zona(id),
+    visitas INT
 );
 
 CREATE TABLE standCaf(

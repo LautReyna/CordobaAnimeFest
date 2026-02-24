@@ -3,7 +3,7 @@ async function obtenerSubscription(){
     // Verifica si el navegador soporta Service Workers
     if(!('serviceWorker' in navigator)) throw new Error('No SW support')
     // Obtiene el registro del Service Worker o lo registra si no existe
-    const reg = await navigator.serviceWorker.getRegistration('/www/') || await navigator.serviceWorker.register('/www/sw.js')
+    const reg = await navigator.serviceWorker.getRegistration('/www/') || await navigator.serviceWorker.register('/sw.js')
     // Intenta obtener la suscripción existente
     let sub = await reg.pushManager.getSubscription()
     
@@ -45,15 +45,17 @@ async function crearOActualizarAlerta(idEvento, modo){
     
     try {
         // Obtiene la suscripción push (la crea si no existe)
+        console.log('Obtener subscripcion...')
         const sub = await obtenerSubscription()
         
         // Envía la solicitud al backend para crear/actualizar la alerta
+        console.log('Enviando formulario...')
         const res = await fetch('/api/v1/alertas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ endpoint: sub.endpoint, idEvento, modo })
         })
-        
+        console.log('Esperando respuesta...')
         const data = await res.json()
         
         // Si la respuesta no es exitosa, lanza error
