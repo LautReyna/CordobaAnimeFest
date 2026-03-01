@@ -33,6 +33,8 @@ rutasEventos.use(express.json())
 
 // Obtiene todos los eventos de la CAF activa
 rutasEventos.get('/api/v1/eventos/caf/activa', controlador.obtenerEventosCafActiva)
+// Obtiene estadísticas de visitas por evento (CAF activa)
+rutasEventos.get('/api/v1/estadisticas/eventos', controlador.obtenerEstadisticasEventos)
 // Obtiene todos los eventos de una CAF específica
 rutasEventos.get('/api/v1/eventos/caf/:idCaf', controlador.obtenerEventosCaf)
 // Obtiene todos los eventos registrados

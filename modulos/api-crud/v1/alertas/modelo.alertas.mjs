@@ -24,8 +24,9 @@ export async function upsertAlertaUsuario(endpoint, idEvento, modo){
     const ins = await pool.query('INSERT INTO alerta(endpoint, idEvento, modo) VALUES($1,$2,$3) RETURNING id',[endpoint, idEvento, modoValido])
     //Incrementa en 1 la cantidad de notificaciones del evento
     await pool.query(
-        `UPDATE evento SET notificaciones = notificaciones + 1 WHERE id = ${idEvento}`
-        )
+        `UPDATE evento SET notificaciones = COALESCE(notificaciones, 0) + 1 WHERE id = $1`,
+        [idEvento]
+    )
     return { id: ins.rows[0].id, creado: true }
     
 }

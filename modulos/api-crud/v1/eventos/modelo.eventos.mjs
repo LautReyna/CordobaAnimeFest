@@ -59,6 +59,38 @@ async function obtenerEventosCafActiva(){
     }
 }
 
+// Obtiene estadísticas de visitas/interés por evento para la CAF activa
+// Usa evento.notificaciones (alertas) + eventoCaf.visitas si existe
+async function obtenerEstadisticasEventos(){
+    try{
+        let resultado
+        try {
+            resultado = await pool.query(`
+                SELECT evento.nombre,
+                    (COALESCE(evento.notificaciones, 0) + COALESCE(eventoCaf.visitas, 0))::int AS visitas
+                FROM evento
+                INNER JOIN eventoCaf ON evento.id = eventoCaf.idEvento
+                INNER JOIN caf ON eventoCaf.idCaf = caf.id
+                WHERE caf.activa = true
+                ORDER BY visitas DESC
+            `)
+        } catch {
+            resultado = await pool.query(`
+                SELECT evento.nombre, COALESCE(evento.notificaciones, 0)::int AS visitas
+                FROM evento
+                INNER JOIN eventoCaf ON evento.id = eventoCaf.idEvento
+                INNER JOIN caf ON eventoCaf.idCaf = caf.id
+                WHERE caf.activa = true
+                ORDER BY visitas DESC
+            `)
+        }
+        return resultado
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}
+
 // Obtiene todos los eventos registrados en la base de datos
 async function obtenerEventos(){
     try{
@@ -189,6 +221,7 @@ export{
     vincularEventoCaf,
     obtenerEventosCaf,
     obtenerEventosCafActiva,
+    obtenerEstadisticasEventos,
     obtenerEventos,
     obtenerEvento,
     crearEvento,

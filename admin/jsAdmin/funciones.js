@@ -49,6 +49,7 @@ export async function crearEnlaces() {
         enlaces.insertAdjacentHTML("afterbegin", `
           <li class="nav-item"><a href="/admin/usuarios.html" class="nav-link">Usuarios</a></li>
           <li class="nav-item"><a href="/admin/auditoria.html" class="nav-link">Auditoria</a></li>
+          <li class="nav-item"><a href="/admin/estadisticas.html" class="nav-link">Estadísticas</a></li>
         `)
   
         // Renderizar interfaz de gestion de CAF

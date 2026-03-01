@@ -188,5 +188,16 @@ async function cancelarEvento(req, res){
     }
 }
 
+// Obtiene estadísticas de visitas por evento (CAF activa)
+async function obtenerEstadisticasEventos(req, res){
+    try{
+        const resultado = await modelo.obtenerEstadisticasEventos()
+        res.json(resultado.rows)
+    }catch(error){
+        console.log(error)
+        res.status(500).json({ mensaje: 'Error en el servidor' })
+    }
+}
+
 // Exporta todas las funciones del controlador
-export { obtenerEventosCaf, obtenerEventosCafActiva, obtenerEventos, obtenerEvento, crearEvento, modificarEvento, eliminarEvento, cancelarEvento }
+export { obtenerEventosCaf, obtenerEventosCafActiva, obtenerEventos, obtenerEvento, obtenerEstadisticasEventos, crearEvento, modificarEvento, eliminarEvento, cancelarEvento }

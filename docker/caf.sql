@@ -23,13 +23,14 @@ CREATE TABLE evento(
     ubicacion INT REFERENCES zona(id),
     descripcion TEXT,
     imagen VARCHAR(250),
-    notificaciones INT
+    notificaciones INT DEFAULT 0
 );
 
 CREATE TABLE eventoCaf(
     id SERIAL PRIMARY KEY,
     idEvento INT REFERENCES evento(id) ON DELETE CASCADE,
-    idCaf INT REFERENCES caf(id) ON DELETE CASCADE
+    idCaf INT REFERENCES caf(id) ON DELETE CASCADE,
+    visitas INT DEFAULT 0
 );
 
 CREATE TABLE stand(

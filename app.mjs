@@ -59,6 +59,9 @@ app.get('/admin/stands.html', verificarAcceso, verificarRol(['Stands', 'Admin'])
 app.get('/admin/usuarios.html', verificarAcceso, verificarRol(['Admin']), (req, res)=> {
     res.sendFile(path.join(__dirname, 'admin/usuarios.html'))
 })
+app.get('/admin/estadisticas.html', verificarAcceso, verificarRol(['Admin']), (req, res)=> {
+    res.sendFile(path.join(__dirname, 'admin/estadisticas.html'))
+})
 
 // Sirve archivos estáticos de la carpeta admin, solo si está autenticado
 app.use('/admin', verificarAcceso, express.static(path.join(__dirname, 'admin')))
