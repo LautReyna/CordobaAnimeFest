@@ -2,6 +2,9 @@
 import { obtenerRegistros } from '../recursos/utilidades.js'
 
 let chartInstance = null
+let totales = null
+let avg = null
+let mode = null
 
 // Función para renderizar el gráfico de visitas por evento
 function renderizarGrafico(datos) {
@@ -19,6 +22,12 @@ function renderizarGrafico(datos) {
 
     const labels = datos.map(d => d.nombre)
     const visitas = datos.map(d => Number(d.visitas) || 0)
+    datos.forEach(d => {
+        totales += Number(d.visitas);
+    });
+    const ranking = datos.sort((a, b) => b.visitas - a.visitas)
+    mode = ranking[0].nombre
+    avg = totales / datos.length
 
     // Destruir instancia anterior si existe
     if (chartInstance) {
@@ -89,12 +98,16 @@ async function cargarEstadisticas() {
         const res = await obtenerRegistros('/api/v1/estadisticas/eventos')
         const datos = await res.json()
         renderizarGrafico(datos)
+        document.getElementById('total').innerHTML = totales
+        document.getElementById('promedio').innerHTML = avg
+        document.getElementById('moda').innerHTML = mode
     } catch (error) {
         console.error('Error cargando estadísticas:', error)
         document.getElementById('sin-datos').classList.remove('d-none')
         document.getElementById('sin-datos').querySelector('p').textContent =
             'Error al cargar las estadísticas. Verifica que haya una CAF activa.'
         document.querySelector('.chart-container').classList.add('d-none')
+        document.getElementById('total').innerHTML = 0
     }
 }
 
