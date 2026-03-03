@@ -9,6 +9,8 @@ rutasStands.use(express.json())
 
 // Rutas para la API de stands
 
+// Obtiene estadísticas de visitas por stand (CAF activa) - debe ir antes de /:id
+rutasStands.get('/api/v1/estadisticas/stands', controlador.obtenerEstadisticasStands)
 // Obtiene todos los stands de la CAF activa
 rutasStands.get('/api/v1/stands/caf/activa', controlador.obtenerStandsCafActiva)
 // Obtiene todos los stands de una CAF específica
@@ -21,6 +23,8 @@ rutasStands.get('/api/v1/stands/:id', controlador.obtenerStand)
 rutasStands.post('/api/v1/stands', controlador.crearStand)
 // Modifica un stand existente
 rutasStands.put('/api/v1/stands/:id', controlador.modificarStand)
+// Incrementa visitas cuando el usuario hace clic en el link del stand
+rutasStands.post('/api/v1/stands/:id/visita', controlador.incrementarVisitaStand)
 // Elimina un stand específico por su ID
 rutasStands.delete('/api/v1/stands/:id', controlador.eliminarStand)
 

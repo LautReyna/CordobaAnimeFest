@@ -38,13 +38,14 @@ CREATE TABLE stand(
     nombre VARCHAR(50),
     descripcion TEXT,
     ubicacion INT REFERENCES zona(id),
-    visitas INT
+    pagina TEXT
 );
 
 CREATE TABLE standCaf(
     id SERIAL PRIMARY KEY,
     idStand INT REFERENCES stand(id) ON DELETE CASCADE,
-    idCaf INT REFERENCES caf(id) ON DELETE CASCADE
+    idCaf INT REFERENCES caf(id) ON DELETE CASCADE,
+    visitas INT DEFAULT 0
 );
 
 CREATE TABLE usuario(

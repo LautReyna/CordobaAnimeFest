@@ -667,6 +667,10 @@ function mostrarModal(lugar, eventos, stands) {
         `
         
         stands.forEach((stand, index) => {
+            const paginaEscapada = stand.pagina ? stand.pagina.replace(/"/g, '&quot;') : ''
+            const linkHtml = stand.pagina
+                ? `<p class="mb-0"><strong>Página:</strong> <a href="#" class="stand-link" data-url="${paginaEscapada}" data-idstand="${stand.idstand}" target="_blank" rel="noopener noreferrer"><i class="bi bi-link-45deg me-1"></i>Visitar página del stand</a></p>`
+                : ''
             contenido += `
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading-stand-${index}">
@@ -678,6 +682,7 @@ function mostrarModal(lugar, eventos, stands) {
                         <div class="accordion-body">
                             <p><strong>Descripción:</strong> ${stand.descripcion || 'Sin descripción'}</p>
                             <p><strong>Ubicación:</strong> ${stand.nombrezona}</p>
+                            ${linkHtml}
                         </div>
                     </div>
                 </div>`
@@ -692,5 +697,24 @@ function mostrarModal(lugar, eventos, stands) {
     }
     
     modalBody.innerHTML = contenido // Inserta el contenido en el modal
+
+    // Delegación de eventos para links de stands (registrar visita al hacer clic)
+    modalBody.querySelectorAll('.stand-link').forEach((link) => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault()
+            const url = link.dataset.url
+            const idStand = link.dataset.idstand
+            const urlValida = url && (url.startsWith('http://') || url.startsWith('https://'))
+            if (idStand && urlValida) {
+                try {
+                    await fetch(`/api/v1/stands/${idStand}/visita`, { method: 'POST', credentials: 'include' })
+                } catch (err) {
+                    console.warn('No se pudo registrar la visita:', err)
+                }
+                window.open(url, '_blank', 'noopener,noreferrer')
+            }
+        })
+    })
+
     new bootstrap.Modal(modal).show() // Muestra el modal
 }

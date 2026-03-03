@@ -14,6 +14,17 @@ async function obtenerStandsCaf(req, res){
     }
 }
 
+// Obtiene estadísticas de visitas por stand (CAF activa).
+async function obtenerEstadisticasStands(req, res){
+    try{
+        const resultado = await modelo.obtenerEstadisticasStands()
+        res.json(resultado.rows)
+    }catch(error){
+        console.log(error)
+        res.status(500).json({ mensaje: 'Error en el servidor' })
+    }
+}
+
 // Obtiene todos los stands de la CAF activa.
 async function obtenerStandsCafActiva(req, res){
     try{
@@ -54,7 +65,8 @@ async function crearStand(req, res) {
         const {
             nombre, 
             descripcion,
-            ubicacion
+            ubicacion,
+            pagina
         } = req.body
 
         if (!nombre || !descripcion || !ubicacion) {
@@ -73,7 +85,8 @@ async function crearStand(req, res) {
         const resultado = await modelo.crearStand({
             nombre, 
             descripcion,
-            ubicacion
+            ubicacion,
+            pagina
         })
         const standCreado = resultado.rows[0]
 
@@ -94,7 +107,8 @@ async function modificarStand(req, res) {
         const {
             nombre, 
             descripcion,
-            ubicacion
+            ubicacion,
+            pagina
         } = req.body
         
         if (!nombre || !descripcion || !ubicacion) {
@@ -104,10 +118,27 @@ async function modificarStand(req, res) {
         const resultado = await modelo.modificarStand(id, {
             nombre, 
             descripcion,
-            ubicacion
+            ubicacion,
+            pagina
         })
         const { nombre: nombreModificado } = resultado.rows[0]
         res.json({ mensaje: `Stand ${nombreModificado} modificado` })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ mensaje: 'Error en el servidor' })
+    }
+}
+
+// Incrementa las visitas de un stand cuando el usuario hace clic en el link.
+async function incrementarVisitaStand(req, res) {
+    try {
+        const { id } = req.params
+        const resultado = await modelo.incrementarVisitaStand(id)
+        if (resultado.rows.length > 0) {
+            res.status(200).json({ mensaje: 'Visita registrada' })
+        } else {
+            res.status(404).json({ mensaje: 'Stand no encontrado en CAF activa' })
+        }
     } catch (error) {
         console.log(error)
         res.status(500).json({ mensaje: 'Error en el servidor' })
@@ -132,4 +163,4 @@ async function eliminarStand(req, res) {
 }
 
 // Exporta todas las funciones del controlador
-export { obtenerStandsCaf, obtenerStandsCafActiva, obtenerStands, obtenerStand, crearStand, modificarStand, eliminarStand }
+export { obtenerStandsCaf, obtenerStandsCafActiva, obtenerEstadisticasStands, obtenerStands, obtenerStand, crearStand, modificarStand, incrementarVisitaStand, eliminarStand }

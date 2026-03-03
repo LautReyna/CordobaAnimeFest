@@ -28,6 +28,25 @@ async function obtenerStandsCaf(idCaf){
     }
 }
 
+// Obtiene estadísticas de visitas por stand (links) para la CAF activa.
+async function obtenerEstadisticasStands(){
+    try{
+        const resultado = await pool.query(`
+            SELECT stand.nombre,
+                   COALESCE(standCaf.visitas, 0)::int AS visitas
+            FROM stand
+            INNER JOIN standCaf ON stand.id = standCaf.idStand
+            INNER JOIN caf ON standCaf.idCaf = caf.id
+            WHERE caf.activa = true
+            ORDER BY visitas DESC
+        `)
+        return resultado
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}
+
 // Obtiene todos los stands asociados a la CAF activa, incluyendo información de zona y caf.
 async function obtenerStandsCafActiva(){
     try{
@@ -35,6 +54,7 @@ async function obtenerStandsCafActiva(){
             SELECT stand.id AS idstand,
                    stand.nombre,
                    stand.descripcion,
+                   stand.pagina,
                    zona.id AS idzona,
                    zona.nombre AS nombrezona,
                    caf.id AS idcaf,
@@ -84,15 +104,16 @@ async function crearStand(stand){
         const {
             nombre, 
             descripcion,
-            ubicacion
+            ubicacion,
+            pagina
         } = stand
         const resultado = await pool.query(
             `INSERT INTO stand
-                (nombre, descripcion, ubicacion)
+                (nombre, descripcion, ubicacion, pagina)
             VALUES
-                ($1,$2,$3)
+                ($1,$2,$3,$4)
             RETURNING nombre, id`,
-            [nombre, descripcion, ubicacion]
+            [nombre, descripcion, ubicacion, pagina || null]
         )
         return resultado
     }catch(error){
@@ -107,17 +128,37 @@ async function modificarStand(id, stand ={}){
         const {
             nombre, 
             descripcion,
-            ubicacion
+            ubicacion,
+            pagina
         } = stand
         const resultado = await pool.query(
             `UPDATE stand
                 SET
                     nombre=$1,
                     descripcion=$2,
-                    ubicacion=$3
-                WHERE id =$4
+                    ubicacion=$3,
+                    pagina=$4
+                WHERE id =$5
                 RETURNING nombre`,
-            [nombre, descripcion, ubicacion, id]
+            [nombre, descripcion, ubicacion, pagina || null, id]
+        )
+        return resultado
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}
+
+// Incrementa las visitas de un stand en la CAF activa.
+async function incrementarVisitaStand(idStand){
+    try{
+        const resultado = await pool.query(
+            `UPDATE standCaf 
+                SET visitas = COALESCE(visitas, 0) + 1 
+                WHERE idStand = $1 
+                AND idCaf = (SELECT id FROM caf WHERE activa = true LIMIT 1)
+                RETURNING id`,
+            [idStand]
         )
         return resultado
     }catch(error){
@@ -146,10 +187,12 @@ async function eliminarStand(id){
 export{
     vincularStandCaf,
     obtenerStandsCaf,
+    obtenerEstadisticasStands,
     obtenerStandsCafActiva,
     obtenerStands,
     obtenerStand,
     crearStand,
     modificarStand,
+    incrementarVisitaStand,
     eliminarStand,
 }

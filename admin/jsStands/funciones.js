@@ -36,6 +36,7 @@ export async function renderizarFormularioPorNombre(datosStands, formulario, men
             formulario.nombre.value = stand.nombre
             formulario.descripcion.value = stand.descripcion
             formulario.ubicacion.value = stand.idzona
+            formulario.pagina.value = stand.pagina || ''
     
             mostrarMensaje(mensajes, `Se encontro un stand con este nombre: ${formulario.nombre.value}`)
         }else{
@@ -58,7 +59,7 @@ export async function renderizarListadoStands(datosStands, contenedorId) {
         if (!datosStands || datosStands.length === 0) {
             filas = `
                 <tr>
-                    <td colspan="6" class="text-center text-muted">
+                    <td colspan="4" class="text-center text-muted">
                         No hay stands registrados
                     </td>
                 </tr>
@@ -69,6 +70,9 @@ export async function renderizarListadoStands(datosStands, contenedorId) {
                 const necesitaBoton = necesitaBotonExpansion(stand.descripcion)
                 const textoMostrar = necesitaBoton ? truncarTexto(stand.descripcion) : stand.descripcion
                 
+                const paginaHtml = stand.pagina
+                    ? `<a href="${stand.pagina}" target="_blank" rel="noopener noreferrer" class="text-decoration-none"><i class="bi bi-link-45deg"></i> Ver página</a>`
+                    : '<span class="text-muted">—</span>'
                 filas += `
                     <tr>
                         <td scope="col">${stand.nombre}</td>
@@ -84,6 +88,7 @@ export async function renderizarListadoStands(datosStands, contenedorId) {
                             </div>
                         </td>
                         <td scope="col">${stand.nombrezona}</td>
+                        <td scope="col">${paginaHtml}</td>
                     </tr>
                 `
             })
