@@ -43,6 +43,10 @@ rutasCaf.put('/api/v1/caf/finalizar', controlador.finalizarCaf)
 rutasCaf.put('/api/v1/caf/:id', upload.single('mapa'), controlador.modificarCaf)
 // Ruta para eliminar una CAF específica por su id
 rutasCaf.delete('/api/v1/caf/:id', controlador.eliminarCaf)
+// Ruta para mostrar Top historial de eventos
+rutasCaf.get('/api/v1/caf/estadisticas/topHistoricoEventos', controlador.topHistoricoEventos)
+// Ruta para mostrar ranking de Cafs por entradas TOP 10
+rutasCaf.get('/api/v1/caf/estadisticas/rankingEntradas', controlador.rankingEntradas)
 
 // Exporta el router para ser usado en la aplicación principal
 export default rutasCaf

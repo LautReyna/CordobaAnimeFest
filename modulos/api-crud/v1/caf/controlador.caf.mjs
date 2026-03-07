@@ -142,5 +142,45 @@ async function finalizarCaf(req, res){
     }
 }
 
+// Obtiene Los eventos mas populares de cada cafs, msotrando las 3 cafs con los eventos mas populares.
+async function topHistoricoEventos(req, res) {
+    try {   
+        const resultado = await modelo.topEventosCaf()
+        if (resultado.rows.length > 0) {
+            res.json(resultado.rows)
+        } else {
+            res.status(404).json({ mensaje: 'Cafs no encontradas' })
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ mensaje: 'Error en el servidor' })
+    }
+}
+
+// Ranking de cafs por entradas
+async function rankingEntradas(req, res){
+    try {
+        const resultado = await modelo.rankingEntradas()
+        if (resultado.rows.length > 0) {
+            res.json(resultado.rows)
+        } else {
+            res.status(404).json({ mensaje: 'Cafs no encontradas' })
+        }
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
 // Exporta todas las funciones del controlador
-export { obtenerCafs, obtenerCaf, obtenerCafActiva, crearCaf, modificarCaf, eliminarCaf, finalizarCaf }
+export { 
+    obtenerCafs, 
+    obtenerCaf, 
+    obtenerCafActiva, 
+    crearCaf, 
+    modificarCaf, 
+    eliminarCaf, 
+    finalizarCaf, 
+    topHistoricoEventos,
+    rankingEntradas
+ }

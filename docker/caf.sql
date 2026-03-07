@@ -4,7 +4,8 @@ CREATE TABLE caf(
     id SERIAL PRIMARY KEY,
     fecha DATE,
     mapa TEXT,
-    activa BOOLEAN
+    activa BOOLEAN,
+    entradas INT DEFAULT 0
 );
 
 CREATE TABLE zona(

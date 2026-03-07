@@ -183,15 +183,58 @@ function renderizarGraficoStands(datos) {
     document.getElementById('moda-stands').innerHTML = modeStands
 }
 
+//Funcion para renderizar tabla de Top Historico
+function renderizarTopHistorico(datos){
+    const tbody = document.getElementById("TablaTopHistorial");
+    
+    // Limpiar Elementos existentes
+    tbody.innerHTML = "";
+
+    datos.forEach(item => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.caf_fecha.slice(0, 10)}</td>
+            <td>${item.evento_nombre}</td>
+            <td>${item.notificaciones}</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+//Funcion para renderizar tabla de Top 10 CAFS
+function renderizarTop10Caf(datos){
+    const tbody = document.getElementById("TablaTop10CAF");
+    console.log(datos)
+    // Limpiar Elementos existentes
+    tbody.innerHTML = "";
+
+    datos.forEach(item => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.fecha.slice(0, 10)}</td>
+            <td>${item.entradas}</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
 // Función para cargar las estadísticas
 async function cargarEstadisticas() {
     try {
-        const [resEventos, resStands] = await Promise.all([
+        const [resEventos, resStands, resTopHistorico, resTOP10CAF] = await Promise.all([
             obtenerRegistros('/api/v1/estadisticas/eventos'),
-            obtenerRegistros('/api/v1/estadisticas/stands')
+            obtenerRegistros('/api/v1/estadisticas/stands'),
+            obtenerRegistros('/api/v1/caf/estadisticas/topHistoricoEventos'),
+            obtenerRegistros('/api/v1/caf/estadisticas/rankingEntradas')
         ])
         const datosEventos = await resEventos.json()
         const datosStands = await resStands.json()
+        const datostopHistoricoEventos = await resTopHistorico.json()
+        const datosTOP10CAF = await resTOP10CAF.json()
 
         renderizarGrafico(datosEventos)
         document.getElementById('total').innerHTML = totales
@@ -199,6 +242,10 @@ async function cargarEstadisticas() {
         document.getElementById('moda').innerHTML = mode
 
         renderizarGraficoStands(datosStands)
+
+        renderizarTopHistorico(datostopHistoricoEventos)
+        renderizarTop10Caf(datosTOP10CAF)
+
     } catch (error) {
         console.error('Error cargando estadísticas:', error)
         document.getElementById('sin-datos').classList.remove('d-none')

@@ -125,6 +125,53 @@ async function finalizarCaf(){
     }
 }
 
+//Funciones Estadisticas de CAF
+//Funcion Top Eventos
+async function topEventosCaf(){
+    try {
+        const resultado = await pool.query(
+            `WITH ranked_events AS (
+                SELECT
+                c.fecha AS caf_fecha,
+                e.id AS evento_id,
+                e.nombre AS evento_nombre,
+                e.notificaciones as notificaciones,
+                ROW_NUMBER() OVER (
+                    PARTITION BY c.id
+                    ORDER BY e.notificaciones DESC
+                ) AS ranking
+                FROM caf c
+                JOIN eventoCaf ec ON ec.idCaf = c.id
+                JOIN evento e ON e.id = ec.idEvento
+            )
+            SELECT
+                caf_fecha,
+                evento_nombre,
+                notificaciones
+            FROM ranked_events
+            WHERE ranking = 1
+            LIMIT 3;`
+        )
+        return resultado
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
+//Funcion Ranking de Cafs por entradas vendidas
+async function rankingEntradas() {
+    try {
+        const resultado = await pool.query(
+            `SELECT fecha, entradas FROM caf ORDER BY entradas DESC LIMIT 10;`
+        )
+        return resultado
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
 // Exporta todas las funciones del modelo de CAF
 export{
     obtenerCafs,
@@ -133,5 +180,7 @@ export{
     crearCaf,
     modificarCaf,
     eliminarCaf,
-    finalizarCaf
+    finalizarCaf,
+    topEventosCaf,
+    rankingEntradas
 }
