@@ -112,11 +112,12 @@ async function eliminarCaf(id){
     }
 }
 
-// Finaliza (desactiva) la CAF que está actualmente activa.
-async function finalizarCaf(){
+// Finaliza (desactiva) la CAF que está actualmente activa y guarda las entradas.
+async function finalizarCaf(entradas = 0){
     try{
         const resultado = await pool.query(
-            'UPDATE caf SET activa = false WHERE activa = true RETURNING fecha'
+            'UPDATE caf SET activa = false, entradas = $1 WHERE activa = true RETURNING fecha',
+            [entradas]
         )
         return resultado
     }catch(error){
@@ -135,10 +136,10 @@ async function topEventosCaf(){
                 c.fecha AS caf_fecha,
                 e.id AS evento_id,
                 e.nombre AS evento_nombre,
-                e.notificaciones as notificaciones,
+                (COALESCE(e.notificaciones, 0) + COALESCE(ec.visitas, 0))::int AS visitas,
                 ROW_NUMBER() OVER (
                     PARTITION BY c.id
-                    ORDER BY e.notificaciones DESC
+                    ORDER BY (COALESCE(e.notificaciones, 0) + COALESCE(ec.visitas, 0)) DESC
                 ) AS ranking
                 FROM caf c
                 JOIN eventoCaf ec ON ec.idCaf = c.id
@@ -147,7 +148,7 @@ async function topEventosCaf(){
             SELECT
                 caf_fecha,
                 evento_nombre,
-                notificaciones
+                visitas
             FROM ranked_events
             WHERE ranking = 1
             LIMIT 3;`

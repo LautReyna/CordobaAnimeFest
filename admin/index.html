@@ -158,6 +158,41 @@
             </div>
         </div>
 
+        <!-- Modal para finalizar CAF con entradas -->
+        <div class="modal fade" id="modal-finalizar-caf" tabindex="-1" aria-labelledby="modal-finalizar-caf-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title fw-bold" id="modal-finalizar-caf-label">
+                            <i class="bi bi-stop-circle me-2"></i> Finalizar CAF
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Ingresá la cantidad de visitas/entradas que tuvo la convención antes de finalizar.
+                        </p>
+                        <form id="form-finalizar-caf">
+                            <div class="mb-3">
+                                <label for="entradas-finalizar" class="form-label fw-semibold">
+                                    <i class="bi bi-people-fill me-1"></i> Cantidad de visitas
+                                </label>
+                                <input type="number" class="form-control" id="entradas-finalizar" name="entradas" min="0" value="0" required>
+                                <div class="form-text">Cantidad total de entradas o visitas de la convención</div>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-stop-circle me-1"></i> Finalizar CAF
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal para modificar zonas de CAF -->
         <div class="modal fade" id="modal-modificar-zonas" tabindex="-1" aria-labelledby="modal-modificar-zonas-label" aria-hidden="true">
             <div class="modal-dialog modal-lg">

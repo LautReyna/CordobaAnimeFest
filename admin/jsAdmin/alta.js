@@ -89,23 +89,28 @@ formModificarCaf.addEventListener('submit', async(e)=>{
   }
 })
 
-// Event listener para el botón de finalización de CAF
-document.addEventListener('click', async(e) => {
-  const btn = e.target.closest('#btn-finalizar')
-  if(btn){
+// Event listener para el formulario de finalización de CAF (modal con entradas)
+document.addEventListener('submit', async (e) => {
+  if (e.target?.id === 'form-finalizar-caf') {
     e.preventDefault()
-    try{
-      // Enviar solicitud PUT para finalizar la CAF
+    const form = e.target
+    const entradas = parseInt(form.entradas.value, 10) || 0
+    try {
       const respuesta = await fetch('/api/v1/caf/finalizar', {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entradas })
       })
       const resultado = await respuesta.json()
-      mostrarMensaje(mensajes, resultado.mensaje || 'Caf finalizada')
+      mostrarMensaje(mensajes, resultado.mensaje || 'CAF finalizada')
 
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modal-finalizar-caf'))
+      modal?.hide()
+      form.entradas.value = 0
       await crearEnlaces()
-    }catch(error){
+    } catch (error) {
       console.log(error)
-      mostrarMensaje(mensajes, 'No se pudo finalizar la caf')
+      mostrarMensaje(mensajes, 'No se pudo finalizar la CAF', 'danger')
     }
   }
 })

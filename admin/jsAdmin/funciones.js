@@ -83,7 +83,8 @@ export async function crearEnlaces() {
                               Modificar
                             </button>
                             <button id="btn-finalizar"
-                              class="btn btn-outline-light btn-sm">
+                              class="btn btn-outline-light btn-sm"
+                              data-bs-toggle="modal" data-bs-target="#modal-finalizar-caf">
                               <i class="bi bi-stop-circle me-1"></i>
                               Finalizar
                             </button>

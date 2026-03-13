@@ -185,39 +185,63 @@ function renderizarGraficoStands(datos) {
 
 //Funcion para renderizar tabla de Top Historico
 function renderizarTopHistorico(datos){
+    const card = document.getElementById("card-top-historico");
     const tbody = document.getElementById("TablaTopHistorial");
-    
-    // Limpiar Elementos existentes
+    const sinDatos = document.getElementById("sin-datos-top-historico");
+    const tableContainer = tbody.closest(".table-responsive");
+
+    const esArray = Array.isArray(datos);
+    const tieneDatos = esArray && datos.length > 0;
+    const tieneVisitas = tieneDatos && datos.some(item => (item.visitas ?? 0) > 0);
+
+    if (!tieneVisitas) {
+        card.classList.add("d-none");
+        return;
+    }
+
+    card.classList.remove("d-none");
+    sinDatos.classList.add("d-none");
+    tableContainer.classList.remove("d-none");
     tbody.innerHTML = "";
 
     datos.forEach(item => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
-            <td>${item.caf_fecha.slice(0, 10)}</td>
-            <td>${item.evento_nombre}</td>
-            <td>${item.notificaciones}</td>
+            <td>${item.caf_fecha?.slice(0, 10) ?? "—"}</td>
+            <td>${item.evento_nombre ?? "—"}</td>
+            <td>${item.visitas ?? 0}</td>
         `;
-
         tbody.appendChild(row);
     });
 }
 
 //Funcion para renderizar tabla de Top 10 CAFS
 function renderizarTop10Caf(datos){
+    const card = document.getElementById("card-top10-caf");
     const tbody = document.getElementById("TablaTop10CAF");
-    console.log(datos)
-    // Limpiar Elementos existentes
+    const sinDatos = document.getElementById("sin-datos-top10-caf");
+    const tableContainer = tbody.closest(".table-responsive");
+
+    const esArray = Array.isArray(datos);
+    const tieneDatos = esArray && datos.length > 0;
+    const tieneEntradas = tieneDatos && datos.some(item => (item.entradas ?? 0) > 0);
+
+    if (!tieneEntradas) {
+        card.classList.add("d-none");
+        return;
+    }
+
+    card.classList.remove("d-none");
+    sinDatos.classList.add("d-none");
+    tableContainer.classList.remove("d-none");
     tbody.innerHTML = "";
 
     datos.forEach(item => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
-            <td>${item.fecha.slice(0, 10)}</td>
-            <td>${item.entradas}</td>
+            <td>${item.fecha?.slice(0, 10) ?? "—"}</td>
+            <td>${item.entradas ?? 0}</td>
         `;
-
         tbody.appendChild(row);
     });
 }

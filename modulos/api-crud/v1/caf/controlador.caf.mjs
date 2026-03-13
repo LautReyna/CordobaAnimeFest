@@ -125,16 +125,17 @@ async function eliminarCaf(req, res) {
     }
 }
 
-// Finaliza la CAF activa actual.
+// Finaliza la CAF activa actual. Recibe entradas (visitas) en el body.
 async function finalizarCaf(req, res){
     try{
-        const resultado = await modelo.finalizarCaf()
+        const entradas = Math.max(0, parseInt(req.body?.entradas, 10) || 0)
+        const resultado = await modelo.finalizarCaf(entradas)
         if(resultado.rows.length > 0){
             const { fecha: fechaTerminada } = resultado.rows[0]
             const fechaFormateada = new Date(fechaTerminada).toISOString().slice(0,10)
-            res.status(200).json({ mensaje: `Caf: ${fechaFormateada} terminada`})
+            res.status(200).json({ mensaje: `CAF: ${fechaFormateada} finalizada`})
         }else{
-            res.status(404).json({mensaje: 'Caf no encontrada'})
+            res.status(404).json({mensaje: 'CAF no encontrada'})
         }
     }catch(error){
         console.log(error)
