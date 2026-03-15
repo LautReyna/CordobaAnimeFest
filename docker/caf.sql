@@ -30,8 +30,7 @@ CREATE TABLE evento(
 CREATE TABLE eventoCaf(
     id SERIAL PRIMARY KEY,
     idEvento INT REFERENCES evento(id) ON DELETE CASCADE,
-    idCaf INT REFERENCES caf(id) ON DELETE CASCADE,
-    visitas INT DEFAULT 0
+    idCaf INT REFERENCES caf(id) ON DELETE CASCADE
 );
 
 CREATE TABLE stand(
