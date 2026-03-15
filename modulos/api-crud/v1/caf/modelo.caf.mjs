@@ -130,21 +130,22 @@ async function finalizarCaf(entradas = 0){
 //Funcion Top Eventos
 async function topEventosCaf(){
     try {
+        console.log('Entra a funcion TopEventos Caf')
         const resultado = await pool.query(
             `WITH ranked_events AS (
-                SELECT
-                c.fecha AS caf_fecha,
-                e.id AS evento_id,
-                e.nombre AS evento_nombre,
-                (COALESCE(e.notificaciones, 0) + COALESCE(ec.visitas, 0))::int AS visitas,
-                ROW_NUMBER() OVER (
-                    PARTITION BY c.id
-                    ORDER BY (COALESCE(e.notificaciones, 0) + COALESCE(ec.visitas, 0)) DESC
-                ) AS ranking
+                    SELECT
+                        c.fecha AS caf_fecha,
+                        e.id AS evento_id,
+                        e.nombre AS evento_nombre,
+                    COALESCE(e.notificaciones, 0) AS visitas,
+                        ROW_NUMBER() OVER (
+                        PARTITION BY c.id
+                    ORDER BY COALESCE(e.notificaciones, 0) DESC
+                    ) AS ranking
                 FROM caf c
                 JOIN eventoCaf ec ON ec.idCaf = c.id
                 JOIN evento e ON e.id = ec.idEvento
-            )
+                )
             SELECT
                 caf_fecha,
                 evento_nombre,
