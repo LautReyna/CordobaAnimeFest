@@ -137,10 +137,10 @@ async function topEventosCaf(){
                         c.fecha AS caf_fecha,
                         e.id AS evento_id,
                         e.nombre AS evento_nombre,
-                    COALESCE(e.notificaciones, 0) AS visitas,
+                        (COALESCE(e.notificaciones, 0) + COALESCE(ec.visitas, 0))::int AS visitas,
                         ROW_NUMBER() OVER (
-                        PARTITION BY c.id
-                    ORDER BY COALESCE(e.notificaciones, 0) DESC
+                            PARTITION BY c.id
+                            ORDER BY (COALESCE(e.notificaciones, 0) + COALESCE(ec.visitas, 0)) DESC
                     ) AS ranking
                 FROM caf c
                 JOIN eventoCaf ec ON ec.idCaf = c.id

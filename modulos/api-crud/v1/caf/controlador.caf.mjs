@@ -146,7 +146,6 @@ async function finalizarCaf(req, res){
 // Obtiene Los eventos mas populares de cada cafs, msotrando las 3 cafs con los eventos mas populares.
 async function topHistoricoEventos(req, res) {
     try {   
-        console.log('Send Request to Async Function')
         const resultado = await modelo.topEventosCaf()
         if (resultado.rows.length > 0) {
             res.json(resultado.rows)
@@ -154,8 +153,8 @@ async function topHistoricoEventos(req, res) {
             res.status(404).json({ mensaje: 'Cafs no encontradas' })
         }
     } catch (error) {
-        console.log('El error fue: ',error)
-        res.status(500).json({ mensaje: 'Error en el servidor en Top Historico Eventos' })
+        console.log(error)
+        res.status(500).json({ mensaje: 'Error en el servidor' })
     }
 }
 
